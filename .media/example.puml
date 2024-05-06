@@ -1,0 +1,13 @@
+@startuml
+participant Клиент
+participant "Frontend\nTelegram-bot на Java/Kotlin" as Frontend
+participant "Middle-слой\nJava/Kotlin-сервис" as Middleware
+participant "Backend\nJava/Kotlin-сервис" as Backend
+
+Клиент -> Frontend : Запрос
+Frontend -> Middleware : Передача запроса
+Middleware -> Backend : Передача запроса
+Backend -> Middleware : Ответ
+Middleware -> Frontend : Ответ
+Frontend -> Клиент : Ответ
+@enduml
