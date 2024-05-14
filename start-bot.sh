@@ -10,7 +10,7 @@ cd "$(dirname "$0")/" || exit 1
 
 ./gradlew build
 
-# Navigate to the correct directory (assuming your structure is like this: .../telegram-bot/Docker/docker-compose.yaml)
+# Navigate to the correct directory
 cd "$(dirname "$0")/Docker" || exit 1
 
 sudo docker-compose up -d telegram-bot

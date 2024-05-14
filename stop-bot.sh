@@ -6,7 +6,7 @@ if ! command -v docker-compose &> /dev/null; then
     exit 1
 fi
 
-# Navigate to the correct directory (assuming your structure is like this: .../semkin-telegram-bot/Docker/docker-compose.yaml)
+# Navigate to the correct directory
 cd "$(dirname "$0")/Docker" || exit 1
 
 sudo docker-compose down
