@@ -19,6 +19,8 @@ public class UpdateHandler {
                 messageHandler.handler(update.getMessage());
             } else if (update.hasCallbackQuery()) {
                 callbackQueryHandler.handle(update.getCallbackQuery());
+            }else {
+                log.info("Received unknown update: {}", update);
             }
         }else {
             log.error("Update is null");
