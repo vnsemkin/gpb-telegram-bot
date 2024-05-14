@@ -22,6 +22,8 @@ public class MessageHandler {
             } else {
                 replyHandler(chatId, text);
             }
+        }else {
+            replyHandler(chatId, BotConstant.NOT_IMPLEMENTED);
         }
     }
 
@@ -34,6 +36,6 @@ public class MessageHandler {
     }
 
     private void replyHandler(long chatId, String text) {
-        sender.send(sender.getSendMessage(chatId, BotConstant.NOT_IMPLEMENTED));
+        sender.send(sender.getSendMessage(chatId, text));
     }
 }
