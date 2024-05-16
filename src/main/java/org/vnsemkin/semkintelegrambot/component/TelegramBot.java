@@ -1,23 +1,26 @@
 package org.vnsemkin.semkintelegrambot.component;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 import org.vnsemkin.semkintelegrambot.config.BotConfig;
 import org.vnsemkin.semkintelegrambot.service.UpdateHandlerService;
 
 @Component
-public class TelegramBot extends TelegramLongPollingBot {
-    @Autowired
-    private UpdateHandlerService updateHandlerService;
+public final class TelegramBot extends TelegramLongPollingBot {
     private final BotConfig botConfig;
+    private final UpdateHandlerService updateHandlerService;
 
-    public TelegramBot(BotConfig botConfig) {
+    public TelegramBot(BotConfig botConfig,
+                       UpdateHandlerService updateHandlerService) {
         super(botConfig.getToken());
+        this.updateHandlerService = updateHandlerService;
         this.botConfig = botConfig;
     }
-
 
     @Override
     public void onUpdateReceived(Update update) {
@@ -26,6 +29,15 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     @Override
     public String getBotUsername() {
-        return botConfig.getBotName();
+        return this.botConfig.getBotName();
+    }
+
+    @PostConstruct
+    private void init() {
+        try {
+            new TelegramBotsApi(DefaultBotSession.class).registerBot(this);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

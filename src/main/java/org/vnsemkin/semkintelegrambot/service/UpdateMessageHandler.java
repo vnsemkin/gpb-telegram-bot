@@ -1,6 +1,7 @@
 package org.vnsemkin.semkintelegrambot.service;
 
 
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -13,7 +14,7 @@ import java.util.Map;
 
 @Slf4j
 @Service
-public class UpdateMessageHandler implements UpdateHandler {
+public final class UpdateMessageHandler implements UpdateHandler {
     private final Sender sender;
     private final Map<String, CommandHandler> commandHandlers = new HashMap<>();
 
@@ -25,19 +26,22 @@ public class UpdateMessageHandler implements UpdateHandler {
     @Override
     public void handle(Update update) {
         if (update.hasMessage()) {
-            Long chatId = update.getMessage().getChatId();
             Message message = update.getMessage();
+            long chatId = message.getChatId();
             if (message.hasText()) {
-                String text = message.getText();
-                if (text.startsWith(BotConstant.COMMAND_DELIMITER)) {
-                    handleCommand(chatId, text);
-                } else {
-                    handleReply(chatId, text);
-                }
-            } else {
-                handleReply(chatId, BotConstant.NOT_IMPLEMENTED);
+                checkOnCommand(chatId, message.getText());
+                return;
             }
+            handleReply(chatId, BotConstant.NOT_IMPLEMENTED);
         }
+    }
+
+    private void checkOnCommand(long chatId, @NotNull String text) {
+        if (text.startsWith(BotConstant.COMMAND_DELIMITER)) {
+            handleCommand(chatId, text);
+            return;
+        }
+        handleReply(chatId, text);
     }
 
     private void handleCommand(long chatId, String text) {
@@ -46,11 +50,11 @@ public class UpdateMessageHandler implements UpdateHandler {
         if (commandHandler != null) {
             commandHandler.handle(chatId, command);
         } else {
-            defaultCommandHandler(chatId, command);
+            defaultCommandHandler(chatId);
         }
     }
 
-    private void defaultCommandHandler(long chatId, String command) {
+    private void defaultCommandHandler(long chatId) {
         sender.send(sender.getSendMessage(chatId, BotConstant.NOT_IMPLEMENTED));
     }
 

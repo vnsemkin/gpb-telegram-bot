@@ -11,17 +11,12 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class UpdateHandlerService {
+public final class UpdateHandlerService {
     private final List<UpdateHandler> updateHandlers;
 
     public void handle(Update update) {
-        if (update != null) {
-            for (UpdateHandler handler : updateHandlers) {
-                handler.handle(update);
-            }
-        } else {
-            log.error("Update is null");
-            throw new RuntimeException("Update is null");
+        for (UpdateHandler handler : updateHandlers) {
+            handler.handle(update);
         }
     }
 }

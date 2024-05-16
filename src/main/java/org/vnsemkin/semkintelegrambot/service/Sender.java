@@ -1,5 +1,6 @@
 package org.vnsemkin.semkintelegrambot.service;
 
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
@@ -12,33 +13,28 @@ import org.vnsemkin.semkintelegrambot.constant.BotConstant;
 
 @Slf4j
 @Service
-public class Sender extends DefaultAbsSender {
+public final class Sender extends DefaultAbsSender {
+
     public Sender(BotConfig botConfig) {
         super(new DefaultBotOptions(), botConfig.getToken());
     }
 
     public SendMessage getSendMessage(long chatId, String text) {
-        SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(chatId);
-        sendMessage.setText(text);
+        SendMessage sendMessage =
+            new SendMessage(Long.toString(chatId), text);
         sendMessage.setParseMode(BotConstant.HTML_MARKUP);
         return sendMessage;
     }
 
-    public void send(Object object) {
-        if (object != null) {
-            if (object instanceof SendMessage sendMessage) {
-                try {
-                    this.execute(sendMessage);
-                } catch (TelegramApiException e) {
-                    log.error(e.getMessage());
-                }
-            } else {
-                log.info(BotConstant.NOT_IMPLEMENTED);
+    public void send(@NonNull Object obj) {
+        if (obj instanceof SendMessage sendMessage) {
+            try {
+                this.execute(sendMessage);
+            } catch (TelegramApiException e) {
+                log.error(e.getMessage());
             }
-        }else {
-            log.error("Object is null");
-            throw new RuntimeException("Object is null");
+        } else {
+            log.info(BotConstant.NOT_IMPLEMENTED);
         }
     }
 }

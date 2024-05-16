@@ -7,7 +7,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 
 @Slf4j
 @Service
-public class UpdateCallbackQueryHandler implements UpdateHandler{
+public final class UpdateCallbackQueryHandler implements UpdateHandler{
     @Override
     public void handle(Update update) {
         if (update.hasCallbackQuery()) {
