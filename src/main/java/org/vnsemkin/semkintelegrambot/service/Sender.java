@@ -37,7 +37,8 @@ public class Sender extends DefaultAbsSender {
                 log.info(BotConstant.NOT_IMPLEMENTED);
             }
         }else {
-            log.error("Update is null");
+            log.error("Object is null");
+            throw new RuntimeException("Object is null");
         }
     }
 }
