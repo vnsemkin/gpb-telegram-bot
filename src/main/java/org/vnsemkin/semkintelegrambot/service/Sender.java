@@ -8,21 +8,22 @@ import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.vnsemkin.semkintelegrambot.config.BotConfig;
-import org.vnsemkin.semkintelegrambot.constant.BotConstant;
 
 
 @Slf4j
 @Service
 public final class Sender extends DefaultAbsSender {
+    private static final String HTML_MARKUP = "HTML";
+    private static final String NOT_IMPLEMENTED = "Функция в разработке";
 
     public Sender(BotConfig botConfig) {
         super(new DefaultBotOptions(), botConfig.getToken());
     }
 
-    public SendMessage getSendMessage(long chatId, String text) {
+    public SendMessage getSendMessage(long chatId, @NonNull String text) {
         SendMessage sendMessage =
             new SendMessage(Long.toString(chatId), text);
-        sendMessage.setParseMode(BotConstant.HTML_MARKUP);
+        sendMessage.setParseMode(HTML_MARKUP);
         return sendMessage;
     }
 
@@ -34,7 +35,7 @@ public final class Sender extends DefaultAbsSender {
                 log.error(e.getMessage());
             }
         } else {
-            log.info(BotConstant.NOT_IMPLEMENTED);
+            log.info(NOT_IMPLEMENTED);
         }
     }
 }
