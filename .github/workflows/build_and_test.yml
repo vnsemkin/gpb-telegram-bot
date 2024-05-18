@@ -13,7 +13,7 @@ jobs:
     permissions:
       contents: read
     env:
-      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_GPB_BOT_TOKEN }}
+      TELEGRAM_GPB_BOT_TOKEN: ${{ secrets.TELEGRAM_GPB_BOT_TOKEN }}
 
     steps:
       - uses: actions/checkout@v4
