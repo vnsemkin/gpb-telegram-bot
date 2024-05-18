@@ -2,12 +2,12 @@ package org.vnsemkin.semkintelegrambot.service;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import org.vnsemkin.semkintelegrambot.config.BotConfig;
 
 
 @Slf4j
@@ -16,8 +16,8 @@ public final class Sender extends DefaultAbsSender {
     private static final String HTML_MARKUP = "HTML";
     private static final String NOT_IMPLEMENTED = "Функция в разработке";
 
-    public Sender(BotConfig botConfig) {
-        super(new DefaultBotOptions(), botConfig.getToken());
+    public Sender(@Value("${telegram.gpb-bot.token}") String token) {
+        super(new DefaultBotOptions(), token);
     }
 
     public SendMessage getSendMessage(long chatId, @NonNull String text) {
