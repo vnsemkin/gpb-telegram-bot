@@ -7,12 +7,14 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 
 @Slf4j
 @Service
-public final class UpdateCallbackQueryHandler implements UpdateHandler{
+public final class UpdateCallbackQueryHandler implements UpdateHandler {
     @Override
     public void handle(Update update) {
-        if (update.hasCallbackQuery()) {
-            CallbackQuery callbackQuery = update.getCallbackQuery();
-            log.info("Got callback query: {}", callbackQuery);
+        if (update.getCallbackQuery() == null) {
+            return;
         }
+        CallbackQuery callbackQuery = update.getCallbackQuery();
+        log.info("Got callback query: {}", callbackQuery);
     }
 }
+
