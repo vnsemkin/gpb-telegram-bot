@@ -1,4 +1,4 @@
-package org.vnsemkin.semkintelegrambot.service;
+package org.vnsemkin.semkintelegrambot.domain.services.common;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -7,7 +7,9 @@ import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.vnsemkin.semkintelegrambot.domain.models.Result;
 
 
 @Slf4j
@@ -27,15 +29,18 @@ public final class Sender extends DefaultAbsSender {
         return sendMessage;
     }
 
-    public void send(@NonNull Object obj) {
+    public Result<Message> send(@NonNull Object obj) {
         if (obj instanceof SendMessage sendMessage) {
             try {
-                this.execute(sendMessage);
+                Result.success(this.execute(sendMessage));
             } catch (TelegramApiException e) {
                 log.error(e.getMessage());
+                return Result.failure(e);
             }
         } else {
             log.info(NOT_IMPLEMENTED);
+            return Result.failure(new TelegramApiException(NOT_IMPLEMENTED));
         }
+        return Result.success(new Message());
     }
 }

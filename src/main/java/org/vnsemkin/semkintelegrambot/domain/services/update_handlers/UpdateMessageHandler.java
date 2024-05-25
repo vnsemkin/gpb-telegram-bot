@@ -1,4 +1,4 @@
-package org.vnsemkin.semkintelegrambot.service;
+package org.vnsemkin.semkintelegrambot.domain.services.update_handlers;
 
 
 import jakarta.validation.constraints.NotNull;
@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.vnsemkin.semkintelegrambot.domain.services.common.Sender;
+import org.vnsemkin.semkintelegrambot.domain.services.command_handlers.CommandHandler;
 
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +22,7 @@ public final class UpdateMessageHandler implements UpdateHandler {
     private final Sender sender;
     private final Map<String, CommandHandler> commandHandlers = new HashMap<>();
 
-    public UpdateMessageHandler(Sender sender, List<CommandHandler> commandHandlerList) {
+    public UpdateMessageHandler(Sender sender,final List<CommandHandler> commandHandlerList) {
         this.sender = sender;
         commandHandlerList.forEach(handler -> commandHandlers.put(handler.getCommand(), handler));
     }
@@ -51,7 +53,7 @@ public final class UpdateMessageHandler implements UpdateHandler {
         String command = text.substring(COMMAND_DELIMITER.length());
         CommandHandler commandHandler = commandHandlers.get(command);
         if (commandHandler != null) {
-            commandHandler.handle(chatId, command);
+            commandHandler.handle(chatId);
         } else {
             defaultCommandHandler(chatId);
         }
