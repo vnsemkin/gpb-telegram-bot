@@ -1,4 +1,4 @@
-package org.vnsemkin.semkintelegrambot.service;
+package org.vnsemkin.semkintelegrambot.domain.services.update_handlers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

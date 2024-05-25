@@ -1,4 +1,4 @@
-package org.vnsemkin.semkintelegrambot.component;
+package org.vnsemkin.semkintelegrambot.domain.components;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.event.ApplicationReadyEvent;

@@ -1,10 +1,10 @@
-package org.vnsemkin.semkintelegrambot.component;
+package org.vnsemkin.semkintelegrambot.domain.components;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.vnsemkin.semkintelegrambot.service.UpdateHandlerService;
+import org.vnsemkin.semkintelegrambot.domain.services.update_handlers.UpdateHandlerService;
 
 @Component
 public final class TelegramBot extends TelegramLongPollingBot {
