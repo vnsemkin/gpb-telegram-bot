@@ -22,25 +22,35 @@ public final class Sender extends DefaultAbsSender {
         super(new DefaultBotOptions(), token);
     }
 
-    public SendMessage getSendMessage(long chatId, @NonNull String text) {
+    public Result<Message> sendText
+        (long chatId, @NonNull String text) {
         SendMessage sendMessage =
             new SendMessage(Long.toString(chatId), text);
-        sendMessage.setParseMode(HTML_MARKUP);
-        return sendMessage;
+        return send(sendMessage);
     }
 
-    public Result<Message> send(@NonNull Object obj) {
+    public Result<Message> sendSendMessage(@NonNull SendMessage sm) {
+        return send(sm);
+    }
+
+    private Result<Message> send(@NonNull Object obj) {
         if (obj instanceof SendMessage sendMessage) {
+            sendMessage.setParseMode(HTML_MARKUP);
             try {
-                Result.success(this.execute(sendMessage));
+                return Result.success(execute(sendMessage));
             } catch (TelegramApiException e) {
                 log.error(e.getMessage());
                 return Result.failure(e);
             }
         } else {
             log.info(NOT_IMPLEMENTED);
-            return Result.failure(new TelegramApiException(NOT_IMPLEMENTED));
+            return Result.success(messageNotImplemented());
         }
-        return Result.success(new Message());
+    }
+
+    private Message messageNotImplemented() {
+        Message message = new Message();
+        message.setText(NOT_IMPLEMENTED);
+        return message;
     }
 }

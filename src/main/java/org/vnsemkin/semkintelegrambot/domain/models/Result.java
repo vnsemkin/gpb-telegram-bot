@@ -1,5 +1,7 @@
 package org.vnsemkin.semkintelegrambot.domain.models;
 
+import lombok.NonNull;
+
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -12,14 +14,11 @@ public final class Result<T> {
         this.error = error;
     }
 
-    public static <T> Result<T> success(T data) {
+    public static <T> Result<T> success(@NonNull T data) {
         return new Result<>(data, null);
     }
 
-    public static <T> Result<T> failure(Throwable error) {
-        if (error == null) {
-            throw new IllegalArgumentException("Error cannot be null for failure Result.");
-        }
+    public static <T> Result<T> failure(@NonNull Throwable error) {
         return new Result<>(null, error);
     }
 
@@ -32,19 +31,11 @@ public final class Result<T> {
     }
 
     public T getData() {
-        if (isSuccess()) {
-            return data;
-        } else {
-            throw new IllegalStateException("Result is not successful.");
-        }
+        return data;
     }
 
     public Throwable getError() {
-        if (isFailure()) {
-            return error;
-        } else {
-            throw new IllegalStateException("Result does not contain an error.");
-        }
+        return error;
     }
 
     public <U> Result<U> map(Function<? super T, ? extends U> mapper) {
