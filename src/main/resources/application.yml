@@ -1,3 +1,5 @@
 spring.application.name: "semkin-telegram-bot"
 telegram.gpb-bot.name: "GPB IT Factory Backend 2024"
 telegram.gpb-bot.token: ${TELEGRAM_GPB_BOT_TOKEN}
+middle-service.base-url: "http://localhost:8080"
+server.port: 8081

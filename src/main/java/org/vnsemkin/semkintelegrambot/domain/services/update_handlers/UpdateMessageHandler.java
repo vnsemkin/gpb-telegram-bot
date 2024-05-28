@@ -10,7 +10,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.vnsemkin.semkintelegrambot.domain.services.command_handlers.CommandHandler;
 import org.vnsemkin.semkintelegrambot.domain.services.reply_handlers.MessageHandler;
-import org.vnsemkin.semkintelegrambot.domain.services.common.Sender;
+import org.vnsemkin.semkintelegrambot.domain.services.senders.TgApiSender;
 
 import java.util.Map;
 
@@ -23,16 +23,16 @@ public final class UpdateMessageHandler implements UpdateHandler {
     private final Map<String, CommandHandler> commandHandlers;
     private final Map<String, MessageHandler> messageHandlers;
     private final Map<Long, String> messageIdToServiceMap;
-    private final Sender sender;
+    private final TgApiSender tgApiSender;
 
     public UpdateMessageHandler(@Qualifier("commandHandlers") Map<String, CommandHandler> commandHandlers,
                                 @Qualifier("messageHandlers") Map<String, MessageHandler> messageHandlers,
                                 Map<Long, String> messageIdToServiceMap,
-                                Sender sender) {
+                                TgApiSender tgApiSender) {
         this.commandHandlers = commandHandlers;
         this.messageHandlers = messageHandlers;
         this.messageIdToServiceMap = messageIdToServiceMap;
-        this.sender = sender;
+        this.tgApiSender = tgApiSender;
     }
 
 
@@ -77,10 +77,10 @@ public final class UpdateMessageHandler implements UpdateHandler {
     }
 
     private void defaultCommandHandler(long chatId) {
-        sender.sendText(chatId, NOT_IMPLEMENTED);
+        tgApiSender.sendText(chatId, NOT_IMPLEMENTED);
     }
 
     private void defaultMessageHandler(long chatId) {
-        sender.sendText(chatId, NOT_IMPLEMENTED);
+        tgApiSender.sendText(chatId, NOT_IMPLEMENTED);
     }
 }
