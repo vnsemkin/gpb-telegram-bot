@@ -5,11 +5,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
+import org.vnsemkin.semkintelegrambot.application.dtos.CustomerDto;
+import org.vnsemkin.semkintelegrambot.application.dtos.ResultDto;
+import org.vnsemkin.semkintelegrambot.application.mappers.ToCustomerDto;
 import org.vnsemkin.semkintelegrambot.domain.constants.CommandToServiceMap;
 import org.vnsemkin.semkintelegrambot.domain.constants.UserRegistrationState;
 import org.vnsemkin.semkintelegrambot.domain.models.Customer;
 import org.vnsemkin.semkintelegrambot.domain.models.Result;
-import org.vnsemkin.semkintelegrambot.domain.services.common.Sender;
+import org.vnsemkin.semkintelegrambot.domain.services.senders.ExternalSender;
+import org.vnsemkin.semkintelegrambot.domain.services.senders.TgApiSender;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,23 +36,28 @@ public class RegistrationService implements MessageHandler {
     private static final String ARROW_EMOJI = "⬇";
     private static final String BOLD_START_TAG = "<b>";
     private static final String BOLD_STOP_TAG = "</b>";
+    private static final String CHAT_ID_NOT_REMOVED = "Не удален chatId";
     private static final String REGISTER_INFO = """
         Добро пожаловать в Мини-Банк.
         Для регистрации пожалуйста !
         """;
-    private final Map<Long, Customer> registeringUsers;
+    private final Map<Long, Customer> customersOnRegistrationMap;
     private final Map<Long, String> messageIdToServiceMap;
-    private final Sender sender;
+    private final TgApiSender tgApiSender;
+    private final ExternalSender externalSender;
 
-    public RegistrationService(Map<Long, String> messageIdToServiceMap, Sender sender) {
+    public RegistrationService(Map<Long, String> messageIdToServiceMap,
+                               TgApiSender tgApiSender,
+                               ExternalSender externalSender) {
         this.messageIdToServiceMap = messageIdToServiceMap;
-        this.registeringUsers = new ConcurrentHashMap<>();
-        this.sender = sender;
+        this.customersOnRegistrationMap = new ConcurrentHashMap<>();
+        this.tgApiSender = tgApiSender;
+        this.externalSender = externalSender;
     }
 
     public void startPickUpInformation(long chatId) {
-        registeringUsers.remove(chatId);
-        Result<Message> messageResult = sender
+        customersOnRegistrationMap.remove(chatId);
+        Result<Message> messageResult = tgApiSender
             .sendSendMessage(startPickUpInfo(chatId));
         messageResult.ifSuccess(msg ->
             messageIdToServiceMap.put(msg.getChatId(), getServiceName()));
@@ -57,7 +66,7 @@ public class RegistrationService implements MessageHandler {
     @Override
     public void handle(@NonNull Message message) {
         long chatId = message.getChatId();
-        Customer customer = registeringUsers.computeIfAbsent(chatId, id -> new Customer());
+        Customer customer = customersOnRegistrationMap.computeIfAbsent(chatId, id -> new Customer());
         UserRegistrationState userState = getUserState(customer);
         String text = message.getText();
         switch (userState) {
@@ -65,11 +74,11 @@ public class RegistrationService implements MessageHandler {
                 Result<Boolean> booleanResult = validateName(text);
                 if (booleanResult.isSuccess()) {
                     customer.setName(text);
-                    sender.sendText(chatId, getNewCustomer(chatId)
+                    tgApiSender.sendText(chatId, getNewCustomer(chatId)
                         + NEW_LINE
                         + INPUT_EMAIL);
                 } else {
-                    sender.sendText(chatId, booleanResult.getError()
+                    tgApiSender.sendText(chatId, booleanResult.getError()
                         .getMessage()
                         + NEW_LINE
                         + INPUT_NAME);
@@ -79,41 +88,55 @@ public class RegistrationService implements MessageHandler {
                 Result<Boolean> booleanResult = validateEmail(text);
                 if (booleanResult.isSuccess()) {
                     customer.setEmail(text);
-                    sender.sendText(chatId, getNewCustomer(chatId)
+                    tgApiSender.sendText(chatId, getNewCustomer(chatId)
                         + NEW_LINE
                         + INPUT_PASSWORD);
                 } else {
-                    sender.sendText(chatId, booleanResult.getError()
+                    tgApiSender.sendText(chatId, booleanResult.getError()
                         .getMessage()
                         + NEW_LINE
-                        + INPUT_PASSWORD);
+                        + INPUT_EMAIL);
                 }
             }
             case WAITING_FOR_PASSWORD -> {
                 Result<Boolean> booleanResult = validatePassword(text);
                 if (booleanResult.isSuccess()) {
                     customer.setPassword(text);
-                    if (completeRegistration(chatId)) {
-                        sender.sendText(chatId, REG_SUCCESS);
-                    } else {
-                        sender.sendText(chatId, REG_FAIL);
-                    }
+                    doRegistration(chatId);
                 } else {
-                    sender.sendText(chatId, booleanResult.getError()
+                    tgApiSender.sendText(chatId, booleanResult.getError()
                         .getMessage());
-                    sender.sendText(chatId, INPUT_PASSWORD);
+                    tgApiSender.sendText(chatId, INPUT_PASSWORD);
                 }
             }
         }
     }
 
-    private boolean completeRegistration(long chatId) {
-        Customer customer = registeringUsers.remove(chatId);
-        if (customer != null) {
-            return true;
+    private void doRegistration(long chatId) {
+        ResultDto<CustomerDto> reg = registerCustomer(chatId);
+        if (reg.getError() == null) {
+            tgApiSender.sendText(chatId, REG_SUCCESS);
+        } else {
+            tgApiSender.sendText(chatId, reg.getError());
+
         }
-        log.warn("Не удален chatId");
-        return false;
+        messageIdToServiceMap.remove(chatId);
+        customersOnRegistrationMap.remove(chatId);
+    }
+
+    private ResultDto<CustomerDto> registerCustomer(long chatId) {
+        Customer customer = customersOnRegistrationMap.get(chatId);
+        if (customer != null) {
+            return registerCustomerInMiddleService(customer);
+        }
+        log.warn(CHAT_ID_NOT_REMOVED);
+        return ResultDto.failure(CHAT_ID_NOT_REMOVED);
+    }
+
+
+    private ResultDto<CustomerDto> registerCustomerInMiddleService(Customer customer) {
+        return externalSender
+            .requestRegistration(ToCustomerDto.toCustomerDto(customer));
     }
 
     private UserRegistrationState getUserState(Customer user) {
@@ -128,7 +151,7 @@ public class RegistrationService implements MessageHandler {
     }
 
     private String getNewCustomer(long chatId) {
-        Customer customer = registeringUsers.get(chatId);
+        Customer customer = customersOnRegistrationMap.get(chatId);
         StringBuilder sb = new StringBuilder();
         if (customer.getName() != null) sb.append(HELLO).append(customer.getName()).append(NEW_LINE);
         if (customer.getEmail() != null) sb.append(EMAIL).append(customer.getEmail()).append(NEW_LINE);
@@ -141,7 +164,7 @@ public class RegistrationService implements MessageHandler {
         sb.append(BOLD_START_TAG);
         sb.append(REGISTER_INFO);
         sb.append(BOLD_STOP_TAG);
-        sb.append("\n");
+        sb.append(NEW_LINE);
         sb.append(INPUT_NAME);
         sb.append(ARROW_EMOJI);
         return new SendMessage(Long.toString(chatId), sb.toString());

@@ -4,17 +4,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.vnsemkin.semkintelegrambot.domain.constants.CommandToServiceMap;
-import org.vnsemkin.semkintelegrambot.domain.services.common.Sender;
+import org.vnsemkin.semkintelegrambot.domain.services.senders.TgApiSender;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public final class StartCommandHandler implements CommandHandler {
-    private final Sender sender;
+    private final TgApiSender tgApiSender;
 
     @Override
     public void handle(long chatId) {
-        sender.sendText(chatId, CommandToServiceMap.START.command);
+        tgApiSender.sendText(chatId, CommandToServiceMap.START.command);
     }
 
     @Override

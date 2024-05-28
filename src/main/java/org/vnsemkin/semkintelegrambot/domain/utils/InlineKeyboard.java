@@ -1,4 +1,4 @@
-package org.vnsemkin.semkintelegrambot.domain.util;
+package org.vnsemkin.semkintelegrambot.domain.utils;
 
 import lombok.NonNull;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;

@@ -1,4 +1,4 @@
-package org.vnsemkin.semkintelegrambot.domain.services.common;
+package org.vnsemkin.semkintelegrambot.domain.services.senders;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -14,11 +14,11 @@ import org.vnsemkin.semkintelegrambot.domain.models.Result;
 
 @Slf4j
 @Service
-public final class Sender extends DefaultAbsSender {
+public final class TgApiSender extends DefaultAbsSender {
     private static final String HTML_MARKUP = "HTML";
     private static final String NOT_IMPLEMENTED = "Функция в разработке";
 
-    public Sender(@Value("${telegram.gpb-bot.token}") String token) {
+    public TgApiSender(@Value("${telegram.gpb-bot.token}") String token) {
         super(new DefaultBotOptions(), token);
     }
 
