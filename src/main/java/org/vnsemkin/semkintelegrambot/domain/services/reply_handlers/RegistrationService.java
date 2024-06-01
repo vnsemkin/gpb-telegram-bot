@@ -7,32 +7,32 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.vnsemkin.semkintelegrambot.application.dtos.CustomerDto;
 import org.vnsemkin.semkintelegrambot.application.dtos.ResultDto;
+import org.vnsemkin.semkintelegrambot.application.externals.TgInterface;
+import org.vnsemkin.semkintelegrambot.application.externals.WebInterface;
 import org.vnsemkin.semkintelegrambot.application.mappers.ToCustomerDto;
 import org.vnsemkin.semkintelegrambot.domain.constants.CommandToServiceMap;
 import org.vnsemkin.semkintelegrambot.domain.constants.UserRegistrationState;
 import org.vnsemkin.semkintelegrambot.domain.models.Customer;
 import org.vnsemkin.semkintelegrambot.domain.models.Result;
-import org.vnsemkin.semkintelegrambot.domain.services.senders.ExternalSender;
-import org.vnsemkin.semkintelegrambot.domain.services.senders.TgApiSender;
+import org.vnsemkin.semkintelegrambot.domain.utils.AppValidator;
+import org.vnsemkin.semkintelegrambot.presentation.tg_client.TgInterfaceImp;
+import org.vnsemkin.semkintelegrambot.presentation.web_client.WebInterfaceImp;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Service
+
 @Slf4j
-public class RegistrationService implements MessageHandler {
+@Service
+public final class RegistrationService implements MessageHandler {
     private static final String INPUT_NAME = "Введите имя";
     private static final String INPUT_EMAIL = "Введите email";
     private static final String INPUT_PASSWORD = "Введите пароль";
     private static final String HELLO = "Привет ";
     private static final String EMAIL = "Email: ";
     private static final String PASSWORD = "Пароль: ";
-    private static final String NOT_VALID_NAME = "Неправильное имя";
     private static final String NEW_LINE = "\n";
-    private static final String NOT_VALID_EMAIL = "Неправильный формат email";
-    private static final String NOT_VALID_PASSWORD = "Неправильный формат пароля";
     private static final String REG_SUCCESS = "Регистрация успешно завершена!";
-    private static final String REG_FAIL = "Что то пошло не так, повторите регистрацию.";
     private static final String ARROW_EMOJI = "⬇";
     private static final String BOLD_START_TAG = "<b>";
     private static final String BOLD_STOP_TAG = "</b>";
@@ -43,21 +43,24 @@ public class RegistrationService implements MessageHandler {
         """;
     private final Map<Long, Customer> customersOnRegistrationMap;
     private final Map<Long, String> messageIdToServiceMap;
-    private final TgApiSender tgApiSender;
-    private final ExternalSender externalSender;
+    private final TgInterface tgInterface;
+    private final WebInterface webInterface;
+    private final AppValidator validator;
 
     public RegistrationService(Map<Long, String> messageIdToServiceMap,
-                               TgApiSender tgApiSender,
-                               ExternalSender externalSender) {
+                               TgInterfaceImp tgSenderImp,
+                               WebInterfaceImp webInterfaceImp,
+                               AppValidator validator) {
         this.messageIdToServiceMap = messageIdToServiceMap;
+        this.webInterface = webInterfaceImp;
+        this.validator = validator;
         this.customersOnRegistrationMap = new ConcurrentHashMap<>();
-        this.tgApiSender = tgApiSender;
-        this.externalSender = externalSender;
+        this.tgInterface = tgSenderImp;
     }
 
     public void startPickUpInformation(long chatId) {
         customersOnRegistrationMap.remove(chatId);
-        Result<Message> messageResult = tgApiSender
+        Result<Message> messageResult = tgInterface
             .sendSendMessage(startPickUpInfo(chatId));
         messageResult.ifSuccess(msg ->
             messageIdToServiceMap.put(msg.getChatId(), getServiceName()));
@@ -71,42 +74,45 @@ public class RegistrationService implements MessageHandler {
         String text = message.getText();
         switch (userState) {
             case WAITING_FOR_NAME -> {
-                Result<Boolean> booleanResult = validateName(text);
+                Result<Boolean> booleanResult = validator.validateName(text);
                 if (booleanResult.isSuccess()) {
                     customer.setName(text);
-                    tgApiSender.sendText(chatId, getNewCustomer(chatId)
+                    tgInterface.sendText(chatId, getNewCustomer(chatId)
                         + NEW_LINE
                         + INPUT_EMAIL);
                 } else {
-                    tgApiSender.sendText(chatId, booleanResult.getError()
+                    tgInterface.sendText(chatId, booleanResult
+                        .getError()
+                        .get()
                         .getMessage()
                         + NEW_LINE
                         + INPUT_NAME);
                 }
             }
             case WAITING_FOR_EMAIL -> {
-                Result<Boolean> booleanResult = validateEmail(text);
+                Result<Boolean> booleanResult = validator.validateEmail(text);
                 if (booleanResult.isSuccess()) {
                     customer.setEmail(text);
-                    tgApiSender.sendText(chatId, getNewCustomer(chatId)
-                        + NEW_LINE
-                        + INPUT_PASSWORD);
+                    tgInterface.sendText(chatId, getNewCustomer(chatId)
+                        + NEW_LINE + INPUT_PASSWORD);
                 } else {
-                    tgApiSender.sendText(chatId, booleanResult.getError()
+                    tgInterface.sendText(chatId, booleanResult
+                        .getError()
+                        .get()
                         .getMessage()
-                        + NEW_LINE
-                        + INPUT_EMAIL);
+                        + NEW_LINE + INPUT_EMAIL);
                 }
             }
             case WAITING_FOR_PASSWORD -> {
-                Result<Boolean> booleanResult = validatePassword(text);
+                Result<Boolean> booleanResult = validator.validatePassword(text);
                 if (booleanResult.isSuccess()) {
                     customer.setPassword(text);
                     doRegistration(chatId);
                 } else {
-                    tgApiSender.sendText(chatId, booleanResult.getError()
-                        .getMessage());
-                    tgApiSender.sendText(chatId, INPUT_PASSWORD);
+                    tgInterface.sendText(chatId, booleanResult
+                        .getError()
+                        .get()
+                        .getMessage() + NEW_LINE + INPUT_PASSWORD);
                 }
             }
         }
@@ -114,10 +120,10 @@ public class RegistrationService implements MessageHandler {
 
     private void doRegistration(long chatId) {
         ResultDto<CustomerDto> reg = registerCustomer(chatId);
-        if (reg.getError() == null) {
-            tgApiSender.sendText(chatId, REG_SUCCESS);
+        if (reg.getError().isEmpty()) {
+            tgInterface.sendText(chatId, REG_SUCCESS);
         } else {
-            tgApiSender.sendText(chatId, reg.getError());
+            tgInterface.sendText(chatId, reg.getError().get());
 
         }
         messageIdToServiceMap.remove(chatId);
@@ -133,11 +139,6 @@ public class RegistrationService implements MessageHandler {
         return ResultDto.failure(CHAT_ID_NOT_REMOVED);
     }
 
-
-    private ResultDto<CustomerDto> registerCustomerInMiddleService(Customer customer) {
-        return externalSender
-            .requestRegistration(ToCustomerDto.toCustomerDto(customer));
-    }
 
     private UserRegistrationState getUserState(Customer user) {
         if (user.getName() == null) {
@@ -170,25 +171,8 @@ public class RegistrationService implements MessageHandler {
         return new SendMessage(Long.toString(chatId), sb.toString());
     }
 
-    private Result<Boolean> validateName(@NonNull String name) {
-        if (name.matches("^[a-zA-Zа-яА-Я]+$") && name.length() <= 10) {
-            return Result.success(true);
-        }
-        return Result.failure(new RuntimeException(NOT_VALID_NAME));
-    }
-
-    private Result<Boolean> validateEmail(@NonNull String email) {
-        if (email.matches("[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+") && email.length() <= 50) {
-            return Result.success(true);
-        }
-        return Result.failure(new RuntimeException(NOT_VALID_EMAIL));
-    }
-
-    private Result<Boolean> validatePassword(@NonNull String password) {
-        if (password.length() >= 5 && password.length() <= 10) {
-            return Result.success(true);
-        }
-        return Result.failure(new RuntimeException(NOT_VALID_PASSWORD));
+    private ResultDto<CustomerDto> registerCustomerInMiddleService(Customer customer) {
+        return webInterface.registerCustomer(ToCustomerDto.toCustomerDto(customer));
     }
 
     @Override

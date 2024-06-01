@@ -11,12 +11,12 @@ import org.vnsemkin.semkintelegrambot.application.externals.WebInterface;
 import reactor.core.publisher.Mono;
 
 @Component
-public class MiddleServiceWebClient implements WebInterface {
+public final class WebInterfaceImp implements WebInterface {
     private final static String REG_ENDPOINT = "/registration";
     private final WebClient webClient;
 
-    public MiddleServiceWebClient(WebClient.Builder webClientBuilder,
-                                  @Value("${middle-service.base-url}") String baseUrl) {
+    public WebInterfaceImp(WebClient.Builder webClientBuilder,
+                           @Value("${middle-service.base-url}") String baseUrl) {
         this.webClient = webClientBuilder.baseUrl(baseUrl).build();
     }
 
@@ -33,7 +33,7 @@ public class MiddleServiceWebClient implements WebInterface {
                     return response.bodyToMono(responseType);
                 } else {
                     return response.bodyToMono(responseType)
-                        .map(resultDto -> ResultDto.failure(resultDto.getError()));
+                        .map(resultDto -> ResultDto.failure(resultDto.getError().get()));
                 }
             })
             .onErrorResume(throwable -> Mono.just(ResultDto.failure(throwable.getMessage())))

@@ -7,7 +7,7 @@ import org.vnsemkin.semkintelegrambot.domain.services.reply_handlers.Registratio
 
 @Service
 @RequiredArgsConstructor
-public class RegisterCommandHandler implements CommandHandler {
+public final class RegisterCommandHandler implements CommandHandler {
     private final RegistrationService registrationService;
 
     @Override

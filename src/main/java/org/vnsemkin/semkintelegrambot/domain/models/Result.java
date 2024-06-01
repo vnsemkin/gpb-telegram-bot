@@ -2,8 +2,8 @@ package org.vnsemkin.semkintelegrambot.domain.models;
 
 import lombok.NonNull;
 
+import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 public final class Result<T> {
     private final T data;
@@ -22,6 +22,12 @@ public final class Result<T> {
         return new Result<>(null, error);
     }
 
+    public void ifSuccess(Consumer<? super T> consumer) {
+        if (isSuccess()) {
+            consumer.accept(data);
+        }
+    }
+
     public boolean isSuccess() {
         return data != null && error == null;
     }
@@ -30,31 +36,11 @@ public final class Result<T> {
         return error != null;
     }
 
-    public T getData() {
-        return data;
+    public Optional<T> getData() {
+        return isSuccess() ? Optional.of(data) : Optional.empty();
     }
 
-    public Throwable getError() {
-        return error;
-    }
-
-    public <U> Result<U> map(Function<? super T, ? extends U> mapper) {
-        if (isSuccess()) {
-            return Result.success(mapper.apply(data));
-        } else {
-            return Result.failure(error);
-        }
-    }
-
-    public void ifSuccess(Consumer<? super T> consumer) {
-        if (isSuccess()) {
-            consumer.accept(data);
-        }
-    }
-
-    public void ifFailure(Consumer<? super Throwable> consumer) {
-        if (isFailure()) {
-            consumer.accept(error);
-        }
+    public Optional<Throwable> getError() {
+        return isFailure() ? Optional.of(error) : Optional.empty();
     }
 }
