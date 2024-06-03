@@ -26,7 +26,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class UserStateHandlerTest {
-
     private static final String VALID_NAME = "ValidName";
     private static final String INVALID_NAME = "InvalidName";
     private static final String VALID_EMAIL = "valid.email@example.com";

@@ -74,10 +74,9 @@ public class AppWebClientImpTest extends SemkinTelegramBotApplicationTests {
     }
 
     @Test
-    public void whenRegisterCustomer_Fail() throws JsonProcessingException {
+    public void whenRegisterCustomer_Fail() {
         // ARRANGE
         CustomerDto customerDto = new CustomerDto(TEST, TEST, TEST);
-        String customerJson = objectMapper.writeValueAsString(customerDto);
         stubFor(post(urlEqualTo(REGISTRATION_ENDPOINT))
             .willReturn(aResponse()
                 .withStatus(HttpStatus.BAD_REQUEST.value())

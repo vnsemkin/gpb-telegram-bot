@@ -8,7 +8,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
-import org.vnsemkin.semkintelegrambot.SemkinTelegramBotApplicationTests;
 import org.vnsemkin.semkintelegrambot.application.externals.TgInterface;
 import org.vnsemkin.semkintelegrambot.domain.constants.CommandToServiceMap;
 import org.vnsemkin.semkintelegrambot.domain.models.Result;
@@ -28,7 +27,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class RegistrationServiceTest extends SemkinTelegramBotApplicationTests {
+public class RegistrationServiceTest {
     private static final long CHAT_ID = 12345L;
     @Mock
     private TgInterface tgInterface;
