@@ -24,15 +24,12 @@ public final class AppWebClientImp implements AppWebClient {
             .post()
             .uri(REG_ENDPOINT)
             .body(BodyInserters.fromValue(customerDto))
-            .exchangeToMono(response -> {
-                if (response.statusCode().is2xxSuccessful()) {
-                    return response.bodyToMono(CustomerDto.class)
-                        .map(Result::<CustomerDto, String>success);
-                } else {
-                    return response.bodyToMono(String.class)
-                        .map(Result::<CustomerDto, String>error);
-                }
-            })
+            .exchangeToMono(response ->
+                response.statusCode().is2xxSuccessful() ?
+                    response.bodyToMono(CustomerDto.class)
+                        .map(Result::<CustomerDto, String>success) :
+                    response.bodyToMono(String.class)
+                        .map(Result::<CustomerDto, String>error))
             .onErrorResume(throwable ->
                 Mono.just(Result.error(throwable.getMessage())))
             .block();

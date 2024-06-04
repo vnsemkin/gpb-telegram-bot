@@ -2,7 +2,7 @@ package org.vnsemkin.semkintelegrambot.domain.services.command_handlers;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.vnsemkin.semkintelegrambot.domain.constants.CommandToServiceMap;
+import org.vnsemkin.semkintelegrambot.application.constants.CommandToServiceMap;
 import org.vnsemkin.semkintelegrambot.domain.services.reply_handlers.registration.RegistrationService;
 
 
@@ -17,12 +17,7 @@ public final class RegisterCommandHandler implements CommandHandler {
     }
 
     @Override
-    public String getCommand() {
-        return CommandToServiceMap.REGISTER.command;
-    }
-
-    @Override
-    public String getServiceName() {
-        return CommandToServiceMap.REGISTER.service;
+    public String getHandlerName() {
+        return CommandToServiceMap.REGISTER.value;
     }
 }

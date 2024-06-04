@@ -10,7 +10,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.vnsemkin.semkintelegrambot.domain.services.command_handlers.CommandHandler;
 import org.vnsemkin.semkintelegrambot.domain.services.reply_handlers.MessageHandler;
-import org.vnsemkin.semkintelegrambot.presentation.tg_client.TgInterfaceImp;
+import org.vnsemkin.semkintelegrambot.presentation.tg_client.TgSenderInterfaceImp;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -26,12 +26,12 @@ public final class UpdateMessageHandler implements UpdateHandler {
     private final Map<String, CommandHandler> commandHandlers;
     private final Map<String, MessageHandler> messageHandlers;
     private final Map<Long, String> messageIdToServiceMap;
-    private final TgInterfaceImp tgSenderImp;
+    private final TgSenderInterfaceImp tgSenderImp;
 
     public UpdateMessageHandler(@Qualifier("commandHandlers") Map<String, CommandHandler> commandHandlers,
                                 @Qualifier("messageHandlers") Map<String, MessageHandler> messageHandlers,
                                 Map<Long, String> messageIdToServiceMap,
-                                TgInterfaceImp tgSenderImp) {
+                                TgSenderInterfaceImp tgSenderImp) {
         this.commandHandlers = commandHandlers;
         this.messageHandlers = messageHandlers;
         this.messageIdToServiceMap = messageIdToServiceMap;

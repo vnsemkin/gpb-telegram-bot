@@ -20,6 +20,5 @@ public final class UpdateCallbackQueryHandler implements UpdateHandler {
         }
         CallbackQuery callbackQuery = update.getCallbackQuery();
         String service = callbackQuery.getData().split(UNDERSCORE)[0];
-        System.out.println(service);
     }
 }

@@ -20,7 +20,7 @@ public final class InlineKeyboard {
                 .map(text -> {
                     InlineKeyboardButton button = new InlineKeyboardButton();
                     button.setText(text);
-                    button.setCallbackData(command.getServiceName() + UNDERSCORE + text);
+                    button.setCallbackData(command.getHandlerName() + UNDERSCORE + text);
                     return button;
                 })
                 .map(List::of)

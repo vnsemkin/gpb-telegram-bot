@@ -8,8 +8,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
-import org.vnsemkin.semkintelegrambot.application.externals.TgInterface;
-import org.vnsemkin.semkintelegrambot.domain.constants.CommandToServiceMap;
+import org.vnsemkin.semkintelegrambot.application.externals.TgSenderInterface;
+import org.vnsemkin.semkintelegrambot.application.constants.CommandToServiceMap;
 import org.vnsemkin.semkintelegrambot.domain.models.Result;
 import org.vnsemkin.semkintelegrambot.domain.services.reply_handlers.registration.RegistrationService;
 import org.vnsemkin.semkintelegrambot.domain.services.reply_handlers.registration.UserStateHandler;
@@ -30,7 +30,7 @@ import static org.mockito.Mockito.when;
 public class RegistrationServiceTest {
     private static final long CHAT_ID = 12345L;
     @Mock
-    private TgInterface tgInterface;
+    private TgSenderInterface tgSenderInterface;
     @Mock
     private UserStateHandler userStateHandler;
     @Mock
@@ -45,7 +45,7 @@ public class RegistrationServiceTest {
     public void setUp() {
         MockitoAnnotations.openMocks(this);
         this.registrationService = new RegistrationService(messageIdToServiceMap,
-            tgInterface,
+            tgSenderInterface,
             userStateHandler);
     }
 
@@ -56,18 +56,18 @@ public class RegistrationServiceTest {
         Optional<Long> optionalChatId = Optional.of(CHAT_ID);
         when(mockMessage.getChatId()).thenReturn(optionalChatId.get());
 
-        when(tgInterface.sendSendMessage(any(SendMessage.class)))
+        when(tgSenderInterface.sendSendMessage(any(SendMessage.class)))
             .thenReturn(Result.success(mockMessage));
         // ACT
         registrationService.startPickUpInformation(CHAT_ID);
 
-        verify(tgInterface).sendSendMessage(sendMessageCaptor.capture());
+        verify(tgSenderInterface).sendSendMessage(sendMessageCaptor.capture());
         SendMessage capturedSendMessage = sendMessageCaptor.getValue();
         // ASSERT
         assertNotNull(capturedSendMessage);
         assertEquals(Long.toString(CHAT_ID), capturedSendMessage.getChatId());
         assertTrue(capturedSendMessage.getText().contains("Добро пожаловать в Мини-Банк."));
-        verify(messageIdToServiceMap).put(eq(CHAT_ID), eq(CommandToServiceMap.REGISTER.service));
+        verify(messageIdToServiceMap).put(eq(CHAT_ID), eq(CommandToServiceMap.REGISTER.value));
     }
 
     @Test
@@ -86,8 +86,8 @@ public class RegistrationServiceTest {
     }
 
     @Test
-    public void testGetServiceName() {
-        String serviceName = registrationService.getServiceName();
-        assertEquals(CommandToServiceMap.REGISTER.service, serviceName);
+    public void testGetHandlerName() {
+        String serviceName = registrationService.getHandlerName();
+        assertEquals(CommandToServiceMap.REGISTER.value, serviceName);
     }
 }

@@ -2,32 +2,27 @@ package org.vnsemkin.semkintelegrambot.domain.services.command_handlers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.vnsemkin.semkintelegrambot.application.externals.TgInterface;
-import org.vnsemkin.semkintelegrambot.domain.constants.CommandToServiceMap;
-import org.vnsemkin.semkintelegrambot.presentation.tg_client.TgInterfaceImp;
+import org.vnsemkin.semkintelegrambot.application.externals.TgSenderInterface;
+import org.vnsemkin.semkintelegrambot.application.constants.CommandToServiceMap;
+import org.vnsemkin.semkintelegrambot.presentation.tg_client.TgSenderInterfaceImp;
 
 @Slf4j
 @Service
 public final class StartCommandHandler implements CommandHandler {
-    private final TgInterface tgInterface;
+    private final TgSenderInterface tgSenderInterface;
 
-    public StartCommandHandler(TgInterfaceImp tgSenderImp) {
-        this.tgInterface = tgSenderImp;
+    public StartCommandHandler(TgSenderInterfaceImp tgSenderImp) {
+        this.tgSenderInterface = tgSenderImp;
     }
 
     @Override
     public void handle(long chatId) {
-        tgInterface.sendText(chatId,
-            CommandToServiceMap.START.command);
+        tgSenderInterface.sendText(chatId,
+            CommandToServiceMap.START.value);
     }
 
     @Override
-    public String getCommand() {
-        return CommandToServiceMap.START.command;
-    }
-
-    @Override
-    public String getServiceName() {
-        return "";
+    public String getHandlerName() {
+        return CommandToServiceMap.START.value;
     }
 }

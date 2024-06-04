@@ -5,10 +5,10 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.vnsemkin.semkintelegrambot.application.dtos.CustomerDto;
-import org.vnsemkin.semkintelegrambot.application.externals.TgInterface;
+import org.vnsemkin.semkintelegrambot.application.externals.TgSenderInterface;
 import org.vnsemkin.semkintelegrambot.application.externals.AppWebClient;
 import org.vnsemkin.semkintelegrambot.application.mappers.AppMapper;
-import org.vnsemkin.semkintelegrambot.domain.constants.UserRegistrationState;
+import org.vnsemkin.semkintelegrambot.application.constants.UserRegistrationState;
 import org.vnsemkin.semkintelegrambot.domain.models.Customer;
 import org.vnsemkin.semkintelegrambot.domain.models.Result;
 import org.vnsemkin.semkintelegrambot.domain.utils.AppValidator;
@@ -30,18 +30,18 @@ public final class UserStateHandler {
     private final AppValidator validator;
     private final Map<Long, String> messageIdToServiceMap;
     private final AppWebClient appWebClient;
-    private final TgInterface tgInterface;
+    private final TgSenderInterface tgSenderInterface;
     private Map<Long, Customer> customersOnRegistrationMap;
     private final AppMapper mapper = AppMapper.INSTANCE;
 
     public UserStateHandler(AppValidator validator,
                             Map<Long, String> messageIdToServiceMap,
                             AppWebClient appWebClient,
-                            TgInterface tgInterface) {
+                            TgSenderInterface tgSenderInterface) {
         this.validator = validator;
         this.messageIdToServiceMap = messageIdToServiceMap;
         this.appWebClient = appWebClient;
-        this.tgInterface = tgInterface;
+        this.tgSenderInterface = tgSenderInterface;
     }
 
     public void handleUserRegistrationState(@NonNull Message message, @NonNull Map<Long,
@@ -63,9 +63,9 @@ public final class UserStateHandler {
         Result<Boolean, String> result = validator.validateName(text);
         if (result.isSuccess()) {
             customer.setName(text);
-            tgInterface.sendText(chatId, buildCustomerInfoMessage(customer) + NEW_LINE + INPUT_EMAIL);
+            tgSenderInterface.sendText(chatId, buildCustomerInfoMessage(customer) + NEW_LINE + INPUT_EMAIL);
         } else {
-            tgInterface.sendText(chatId, getErrorMessage(result, INPUT_NAME));
+            tgSenderInterface.sendText(chatId, getErrorMessage(result, INPUT_NAME));
         }
     }
 
@@ -73,9 +73,9 @@ public final class UserStateHandler {
         Result<Boolean, String> result = validator.validateEmail(text);
         if (result.isSuccess()) {
             customer.setEmail(text);
-            tgInterface.sendText(chatId, buildCustomerInfoMessage(customer) + NEW_LINE + INPUT_PASSWORD);
+            tgSenderInterface.sendText(chatId, buildCustomerInfoMessage(customer) + NEW_LINE + INPUT_PASSWORD);
         } else {
-            tgInterface.sendText(chatId, getErrorMessage(result, INPUT_EMAIL));
+            tgSenderInterface.sendText(chatId, getErrorMessage(result, INPUT_EMAIL));
         }
     }
 
@@ -85,16 +85,16 @@ public final class UserStateHandler {
             customer.setPassword(text);
             registerCustomer(chatId, customer);
         } else {
-            tgInterface.sendText(chatId, getErrorMessage(result, INPUT_PASSWORD));
+            tgSenderInterface.sendText(chatId, getErrorMessage(result, INPUT_PASSWORD));
         }
     }
 
     private void registerCustomer(long chatId, Customer customer) {
         Result<CustomerDto, String> regResult = appWebClient.registerCustomer(mapper.toDto(customer));
         if (regResult.isSuccess()) {
-            tgInterface.sendText(chatId, REG_SUCCESS);
+            tgSenderInterface.sendText(chatId, REG_SUCCESS);
         } else {
-            tgInterface.sendText(chatId, REG_FAIL);
+            tgSenderInterface.sendText(chatId, REG_FAIL);
         }
         messageIdToServiceMap.remove(chatId);
         customersOnRegistrationMap.remove(chatId);

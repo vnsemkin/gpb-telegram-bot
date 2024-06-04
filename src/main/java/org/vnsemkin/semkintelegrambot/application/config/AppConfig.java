@@ -1,4 +1,4 @@
-package org.vnsemkin.semkintelegrambot.domain.config;
+package org.vnsemkin.semkintelegrambot.application.config;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -23,7 +23,7 @@ public class AppConfig {
     public Map<String, CommandHandler> commandHandlers(List<CommandHandler> commandHandlerList) {
         Map<String, CommandHandler> commandHandlers = new HashMap<>();
         for (CommandHandler handler : commandHandlerList) {
-            commandHandlers.put(handler.getCommand(), handler);
+            commandHandlers.put(handler.getHandlerName(), handler);
         }
         return commandHandlers;
     }
@@ -33,7 +33,7 @@ public class AppConfig {
     public Map<String, MessageHandler> messageHandlers(List<MessageHandler> messageHandlerList) {
         Map<String, MessageHandler> messageHandlers = new HashMap<>();
         for (MessageHandler handler : messageHandlerList) {
-            messageHandlers.put(handler.getServiceName(), handler);
+            messageHandlers.put(handler.getHandlerName(), handler);
         }
         return messageHandlers;
     }

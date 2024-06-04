@@ -7,7 +7,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.vnsemkin.semkintelegrambot.application.dtos.CustomerDto;
-import org.vnsemkin.semkintelegrambot.application.externals.TgInterface;
+import org.vnsemkin.semkintelegrambot.application.externals.TgSenderInterface;
 import org.vnsemkin.semkintelegrambot.application.externals.AppWebClient;
 import org.vnsemkin.semkintelegrambot.domain.models.Customer;
 import org.vnsemkin.semkintelegrambot.domain.models.Result;
@@ -42,7 +42,7 @@ public class UserStateHandlerTest {
     @Mock
     private AppValidator validator;
     @Mock
-    private TgInterface tgInterface;
+    private TgSenderInterface tgSenderInterface;
     @Mock
     private AppWebClient appWebClient;
     @Mock
@@ -55,7 +55,7 @@ public class UserStateHandlerTest {
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        userStateHandler = new UserStateHandler(validator, messageIdToServiceMap, appWebClient, tgInterface);
+        userStateHandler = new UserStateHandler(validator, messageIdToServiceMap, appWebClient, tgSenderInterface);
     }
 
     @Test
@@ -67,7 +67,7 @@ public class UserStateHandlerTest {
         userStateHandler.handleUserRegistrationState(message, customersOnRegistrationMap);
 
         assertEquals(VALID_NAME, customersOnRegistrationMap.get(CHAT_ID).getName());
-        verify(tgInterface).sendText(eq(CHAT_ID), contains("Введите email"));
+        verify(tgSenderInterface).sendText(eq(CHAT_ID), contains("Введите email"));
     }
 
     @Test
@@ -78,7 +78,7 @@ public class UserStateHandlerTest {
 
         userStateHandler.handleUserRegistrationState(message, customersOnRegistrationMap);
 
-        verify(tgInterface).sendText(eq(CHAT_ID), contains(ERROR_INVALID_NAME + "\nВведите имя"));
+        verify(tgSenderInterface).sendText(eq(CHAT_ID), contains(ERROR_INVALID_NAME + "\nВведите имя"));
     }
 
     @Test
@@ -94,7 +94,7 @@ public class UserStateHandlerTest {
         userStateHandler.handleUserRegistrationState(message, customersOnRegistrationMap);
 
         assertEquals(VALID_EMAIL, customersOnRegistrationMap.get(CHAT_ID).getEmail());
-        verify(tgInterface).sendText(eq(CHAT_ID), contains("Введите пароль"));
+        verify(tgSenderInterface).sendText(eq(CHAT_ID), contains("Введите пароль"));
     }
 
     @Test
@@ -109,7 +109,7 @@ public class UserStateHandlerTest {
 
         userStateHandler.handleUserRegistrationState(message, customersOnRegistrationMap);
 
-        verify(tgInterface).sendText(eq(CHAT_ID), contains(ERROR_INVALID_EMAIL + "\nВведите email"));
+        verify(tgSenderInterface).sendText(eq(CHAT_ID), contains(ERROR_INVALID_EMAIL + "\nВведите email"));
     }
 
     @Test
@@ -129,7 +129,7 @@ public class UserStateHandlerTest {
 
         userStateHandler.handleUserRegistrationState(message, customersOnRegistrationMap);
 
-        verify(tgInterface).sendText(eq(CHAT_ID), contains(REG_SUCCESS_MESSAGE));
+        verify(tgSenderInterface).sendText(eq(CHAT_ID), contains(REG_SUCCESS_MESSAGE));
     }
 
     @Test
@@ -145,6 +145,6 @@ public class UserStateHandlerTest {
 
         userStateHandler.handleUserRegistrationState(message, customersOnRegistrationMap);
 
-        verify(tgInterface).sendText(eq(CHAT_ID), contains(ERROR_INVALID_PASSWORD + "\nВведите пароль"));
+        verify(tgSenderInterface).sendText(eq(CHAT_ID), contains(ERROR_INVALID_PASSWORD + "\nВведите пароль"));
     }
 }

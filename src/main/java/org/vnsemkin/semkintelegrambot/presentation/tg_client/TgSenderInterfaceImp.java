@@ -9,17 +9,17 @@ import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import org.vnsemkin.semkintelegrambot.application.externals.TgInterface;
+import org.vnsemkin.semkintelegrambot.application.externals.TgSenderInterface;
 import org.vnsemkin.semkintelegrambot.domain.models.Result;
 
 
 @Slf4j
 @Service
-public final class TgInterfaceImp extends DefaultAbsSender implements TgInterface {
+public final class TgSenderInterfaceImp extends DefaultAbsSender implements TgSenderInterface {
     private static final String HTML_MARKUP = "HTML";
     private static final String NOT_IMPLEMENTED = "Функция в разработке";
 
-    public TgInterfaceImp(@Value("${telegram.gpb-bot.token}") String token) {
+    public TgSenderInterfaceImp(@Value("${telegram.gpb-bot.token}") String token) {
         super(new DefaultBotOptions(), token);
     }
 

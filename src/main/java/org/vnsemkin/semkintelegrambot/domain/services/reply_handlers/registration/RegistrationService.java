@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
-import org.vnsemkin.semkintelegrambot.application.externals.TgInterface;
-import org.vnsemkin.semkintelegrambot.domain.constants.CommandToServiceMap;
+import org.vnsemkin.semkintelegrambot.application.externals.TgSenderInterface;
+import org.vnsemkin.semkintelegrambot.application.constants.CommandToServiceMap;
 import org.vnsemkin.semkintelegrambot.domain.models.Customer;
 import org.vnsemkin.semkintelegrambot.domain.models.Result;
 import org.vnsemkin.semkintelegrambot.domain.services.reply_handlers.MessageHandler;
@@ -28,28 +28,28 @@ public final class RegistrationService implements MessageHandler {
         """;
     private final Map<Long, Customer> customersOnRegistrationMap;
     private final Map<Long, String> messageIdToServiceMap;
-    private final TgInterface tgInterface;
+    private final TgSenderInterface tgSenderInterface;
 
     private final UserStateHandler userStateHandler;
 
     public RegistrationService(Map<Long, String> messageIdToServiceMap,
-                               TgInterface tgInterface,
+                               TgSenderInterface tgSenderInterface,
                                UserStateHandler userStateHandler) {
         this.userStateHandler = userStateHandler;
         this.customersOnRegistrationMap = new ConcurrentHashMap<>();
         this.messageIdToServiceMap = messageIdToServiceMap;
-        this.tgInterface = tgInterface;
+        this.tgSenderInterface = tgSenderInterface;
     }
 
 
     public void startPickUpInformation(long chatId) {
         customersOnRegistrationMap.remove(chatId);
-        Result<Message, String> messageResult = tgInterface
+        Result<Message, String> messageResult = tgSenderInterface
             .sendSendMessage(createWelcomeMessage(chatId));
         if (messageResult.isSuccess()) {
             messageResult.getData()
                 .map(Message::getChatId)
-                .ifPresent(id -> messageIdToServiceMap.put(id, getServiceName()));
+                .ifPresent(id -> messageIdToServiceMap.put(id, getHandlerName()));
         }
     }
 
@@ -69,7 +69,7 @@ public final class RegistrationService implements MessageHandler {
     }
 
     @Override
-    public String getServiceName() {
-        return CommandToServiceMap.REGISTER.service;
+    public String getHandlerName() {
+        return CommandToServiceMap.REGISTER.value;
     }
 }
