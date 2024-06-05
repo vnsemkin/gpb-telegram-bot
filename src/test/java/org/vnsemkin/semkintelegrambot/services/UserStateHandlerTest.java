@@ -26,13 +26,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class UserStateHandlerTest {
+    private static final long TG_ID = 120198730L;
+    private static final String TG_USERNAME = "test";
     private static final String VALID_NAME = "ValidName";
-    private static final String INVALID_NAME = "InvalidName";
     private static final String VALID_EMAIL = "valid.email@example.com";
     private static final String INVALID_EMAIL = "invalid-email";
     private static final String VALID_PASSWORD = "ValidPassword";
     private static final String INVALID_PASSWORD = "invalid-password";
-    private static final String ERROR_INVALID_NAME = "Invalid name";
     private static final String ERROR_INVALID_EMAIL = "Invalid email";
     private static final String ERROR_INVALID_PASSWORD = "Invalid password";
     private static final String REG_SUCCESS_MESSAGE = "Регистрация успешно завершена!";
@@ -59,32 +59,10 @@ public class UserStateHandlerTest {
     }
 
     @Test
-    public void testHandleUserRegistrationState_waitingForName_validName() {
-        when(message.getChatId()).thenReturn(CHAT_ID);
-        when(message.getText()).thenReturn(VALID_NAME);
-        when(validator.validateName(anyString())).thenReturn(Result.success(true));
-
-        userStateHandler.handleUserRegistrationState(message, customersOnRegistrationMap);
-
-        assertEquals(VALID_NAME, customersOnRegistrationMap.get(CHAT_ID).getName());
-        verify(tgSenderInterface).sendText(eq(CHAT_ID), contains("Введите email"));
-    }
-
-    @Test
-    public void testHandleUserRegistrationState_waitingForName_invalidName() {
-        when(message.getChatId()).thenReturn(CHAT_ID);
-        when(message.getText()).thenReturn(INVALID_NAME);
-        when(validator.validateName(anyString())).thenReturn(Result.error(ERROR_INVALID_NAME));
-
-        userStateHandler.handleUserRegistrationState(message, customersOnRegistrationMap);
-
-        verify(tgSenderInterface).sendText(eq(CHAT_ID), contains(ERROR_INVALID_NAME + "\nВведите имя"));
-    }
-
-    @Test
     public void testHandleUserRegistrationState_waitingForEmail_validEmail() {
         Customer customer = new Customer();
-        customer.setName(VALID_NAME);
+        customer.setFirstName(VALID_NAME);
+        customer.setUsername(VALID_NAME);
         customersOnRegistrationMap.put(CHAT_ID, customer);
 
         when(message.getChatId()).thenReturn(CHAT_ID);
@@ -100,7 +78,8 @@ public class UserStateHandlerTest {
     @Test
     public void testHandleUserRegistrationState_waitingForEmail_invalidEmail() {
         Customer customer = new Customer();
-        customer.setName(VALID_NAME);
+        customer.setFirstName(VALID_NAME);
+        customer.setUsername(VALID_NAME);
         customersOnRegistrationMap.put(CHAT_ID, customer);
 
         when(message.getChatId()).thenReturn(CHAT_ID);
@@ -115,7 +94,8 @@ public class UserStateHandlerTest {
     @Test
     public void testHandleUserRegistrationState_waitingForPassword_validPassword() {
         Customer customer = new Customer();
-        customer.setName(VALID_NAME);
+        customer.setFirstName(VALID_NAME);
+        customer.setUsername(VALID_NAME);
         customer.setEmail(VALID_EMAIL);
         customersOnRegistrationMap.put(CHAT_ID, customer);
 
@@ -124,7 +104,7 @@ public class UserStateHandlerTest {
         when(validator.validatePassword(anyString())).thenReturn(Result.success(true));
 
         Result<CustomerDto, String> regResult =
-            Result.success(new CustomerDto(EMPTY_STRING, EMPTY_STRING, EMPTY_STRING));
+            Result.success(new CustomerDto(TG_ID, TG_USERNAME, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING));
         when(appWebClient.registerCustomer(any(CustomerDto.class))).thenReturn(regResult);
 
         userStateHandler.handleUserRegistrationState(message, customersOnRegistrationMap);
@@ -135,7 +115,8 @@ public class UserStateHandlerTest {
     @Test
     public void testHandleUserRegistrationState_waitingForPassword_invalidPassword() {
         Customer customer = new Customer();
-        customer.setName(VALID_NAME);
+        customer.setFirstName(VALID_NAME);
+        customer.setUsername(VALID_NAME);
         customer.setEmail(VALID_EMAIL);
         customersOnRegistrationMap.put(CHAT_ID, customer);
 

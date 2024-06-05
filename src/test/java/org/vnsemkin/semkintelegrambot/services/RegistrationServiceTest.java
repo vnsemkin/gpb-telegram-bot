@@ -8,14 +8,14 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
-import org.vnsemkin.semkintelegrambot.application.externals.TgSenderInterface;
+import org.telegram.telegrambots.meta.api.objects.User;
 import org.vnsemkin.semkintelegrambot.application.constants.CommandToServiceMap;
+import org.vnsemkin.semkintelegrambot.application.externals.TgSenderInterface;
 import org.vnsemkin.semkintelegrambot.domain.models.Result;
 import org.vnsemkin.semkintelegrambot.domain.services.reply_handlers.registration.RegistrationService;
 import org.vnsemkin.semkintelegrambot.domain.services.reply_handlers.registration.UserStateHandler;
 
 import java.util.Map;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -53,13 +53,13 @@ public class RegistrationServiceTest {
     public void testStartPickUpInformation() {
         // ARRANGE
         Message mockMessage = mock(Message.class);
-        Optional<Long> optionalChatId = Optional.of(CHAT_ID);
-        when(mockMessage.getChatId()).thenReturn(optionalChatId.get());
-
+        User user = mock(User.class);
+        when(mockMessage.getFrom()).thenReturn(user);
+        when(mockMessage.getChatId()).thenReturn(CHAT_ID);
         when(tgSenderInterface.sendSendMessage(any(SendMessage.class)))
             .thenReturn(Result.success(mockMessage));
         // ACT
-        registrationService.startPickUpInformation(CHAT_ID);
+        registrationService.startPickUpInformation(mockMessage);
 
         verify(tgSenderInterface).sendSendMessage(sendMessageCaptor.capture());
         SendMessage capturedSendMessage = sendMessageCaptor.getValue();
@@ -74,7 +74,9 @@ public class RegistrationServiceTest {
     public void testHandle() {
         // ARRANGE
         Message mockMessage = mock(Message.class);
-        when(mockMessage.getChatId()).thenReturn(12345L);
+        User user = mock(User.class);
+        when(mockMessage.getFrom()).thenReturn(user);
+        when(mockMessage.getChatId()).thenReturn(CHAT_ID);
         // ACT
         registrationService.handle(mockMessage);
         // ASSERT
@@ -83,6 +85,7 @@ public class RegistrationServiceTest {
 
         assertNotNull(capturedMessage);
         assertEquals(mockMessage.getChatId(), capturedMessage.getChatId());
+        assertEquals(mockMessage.getFrom(), capturedMessage.getFrom());
     }
 
     @Test

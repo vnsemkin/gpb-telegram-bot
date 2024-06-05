@@ -74,7 +74,7 @@ public class UpdateMessageHandlerTest {
 
         updateMessageHandler.handle(update);
 
-        verify(commandHandler).handle(CHAT_ID);
+        verify(commandHandler).handle(message);
         verifyNoMoreInteractions(tgSenderImp);
     }
 

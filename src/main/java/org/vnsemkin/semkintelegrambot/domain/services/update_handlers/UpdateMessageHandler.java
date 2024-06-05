@@ -51,22 +51,21 @@ public final class UpdateMessageHandler implements UpdateHandler {
     }
 
     private void handleMessage(@NotNull Message message) {
-        String text = message.getText();
-        Long chatId = message.getChatId();
-        if (text.startsWith(COMMAND_DELIMITER)) {
-            handleCommand(chatId, text);
+        if (message.getText().startsWith(COMMAND_DELIMITER)) {
+            handleCommand(message);
             return;
         }
         handleReply(message);
     }
 
-    private void handleCommand(long chatId, @NonNull String text) {
-        String command = text.substring(COMMAND_DELIMITER.length());
+    private void handleCommand(Message message) {
+        String command = message.getText()
+            .substring(COMMAND_DELIMITER.length());
         CommandHandler commandHandler = commandHandlers.get(command);
         if (commandHandler != null) {
-            commandHandler.handle(chatId);
+            commandHandler.handle(message);
         } else {
-            defaultCommandHandler(chatId);
+            defaultCommandHandler(message.getChatId());
         }
     }
 
@@ -80,7 +79,8 @@ public final class UpdateMessageHandler implements UpdateHandler {
     }
 
     private void defaultCommandHandler(long chatId) {
-        tgSenderImp.sendText(chatId, COMMAND_NOT_IMPLEMENTED);
+        tgSenderImp.sendText(chatId,
+            COMMAND_NOT_IMPLEMENTED);
     }
 
     private void defaultMessageHandler(long chatId) {

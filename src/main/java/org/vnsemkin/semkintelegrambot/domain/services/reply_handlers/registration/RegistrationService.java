@@ -5,8 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
-import org.vnsemkin.semkintelegrambot.application.externals.TgSenderInterface;
+import org.telegram.telegrambots.meta.api.objects.User;
 import org.vnsemkin.semkintelegrambot.application.constants.CommandToServiceMap;
+import org.vnsemkin.semkintelegrambot.application.externals.TgSenderInterface;
 import org.vnsemkin.semkintelegrambot.domain.models.Customer;
 import org.vnsemkin.semkintelegrambot.domain.models.Result;
 import org.vnsemkin.semkintelegrambot.domain.services.reply_handlers.MessageHandler;
@@ -17,12 +18,13 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 @Service
 public final class RegistrationService implements MessageHandler {
-    private static final String INPUT_NAME = "Введите имя";
+    private static final String INPUT_NAME = "Введите email";
     private static final String NEW_LINE = "\n";
     private static final String ARROW_EMOJI = "⬇";
     private static final String BOLD_START_TAG = "<b>";
     private static final String BOLD_STOP_TAG = "</b>";
     private static final String REGISTER_INFO = """
+        Привет %s
         Добро пожаловать в Мини-Банк.
         Для регистрации пожалуйста !
         """;
@@ -42,10 +44,17 @@ public final class RegistrationService implements MessageHandler {
     }
 
 
-    public void startPickUpInformation(long chatId) {
+    public void startPickUpInformation(Message message) {
+        long chatId = message.getChatId();
+        User user = message.getFrom();
         customersOnRegistrationMap.remove(chatId);
+        Customer customer = customersOnRegistrationMap
+            .computeIfAbsent(chatId, id -> new Customer());
+        customer.setTgId(user.getId());
+        customer.setFirstName(user.getFirstName());
+        customer.setUsername(user.getUserName());
         Result<Message, String> messageResult = tgSenderInterface
-            .sendSendMessage(createWelcomeMessage(chatId));
+            .sendSendMessage(createWelcomeMessage(chatId, customer.getFirstName()));
         if (messageResult.isSuccess()) {
             messageResult.getData()
                 .map(Message::getChatId)
@@ -58,14 +67,14 @@ public final class RegistrationService implements MessageHandler {
         userStateHandler.handleUserRegistrationState(message, customersOnRegistrationMap);
     }
 
-    private SendMessage createWelcomeMessage(long chatId) {
-        String inputName = BOLD_START_TAG +
+    private SendMessage createWelcomeMessage(long chatId, String firstName) {
+        String welcomeMessage = String.format(BOLD_START_TAG +
             REGISTER_INFO +
             BOLD_STOP_TAG +
             NEW_LINE +
             INPUT_NAME +
-            ARROW_EMOJI;
-        return new SendMessage(Long.toString(chatId), inputName);
+            ARROW_EMOJI, firstName);
+        return new SendMessage(Long.toString(chatId), welcomeMessage);
     }
 
     @Override

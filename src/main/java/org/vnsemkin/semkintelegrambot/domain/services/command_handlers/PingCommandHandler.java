@@ -2,8 +2,9 @@ package org.vnsemkin.semkintelegrambot.domain.services.command_handlers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.vnsemkin.semkintelegrambot.application.externals.TgSenderInterface;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.vnsemkin.semkintelegrambot.application.constants.CommandToServiceMap;
+import org.vnsemkin.semkintelegrambot.application.externals.TgSenderInterface;
 import org.vnsemkin.semkintelegrambot.presentation.tg_client.TgSenderInterfaceImp;
 
 @Slf4j
@@ -17,8 +18,8 @@ public final class PingCommandHandler implements CommandHandler {
     }
 
     @Override
-    public void handle(long chatId) {
-        tgSenderInterface.sendText(chatId, PONG_ANSWER);
+    public void handle(Message message) {
+        tgSenderInterface.sendText(message.getChatId(), PONG_ANSWER);
     }
 
     @Override

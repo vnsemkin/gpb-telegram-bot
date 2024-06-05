@@ -10,7 +10,9 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public class Customer {
-    private String name;
+    private long tgId;
+    private String firstName;
+    private String username;
     private String email;
     private String password;
 }

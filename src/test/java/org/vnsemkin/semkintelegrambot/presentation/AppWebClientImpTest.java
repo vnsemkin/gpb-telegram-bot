@@ -26,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AppWebClientImpTest extends SemkinTelegramBotApplicationTests {
+    private final static long TEST_ID = 1278387L;
     private final static String TEST = "Test";
     private final static String ERROR = "Error";
     private final static String REGISTRATION_ENDPOINT = "/registration";
@@ -54,7 +55,7 @@ public class AppWebClientImpTest extends SemkinTelegramBotApplicationTests {
     @Test
     public void whenRegisterCustomer_Success() throws JsonProcessingException {
         // ARRANGE
-        CustomerDto customerDto = new CustomerDto(TEST, TEST, TEST);
+        CustomerDto customerDto = new CustomerDto(TEST_ID, TEST, TEST, TEST, TEST);
         String customerJson = objectMapper.writeValueAsString(customerDto);
         stubFor(post(urlEqualTo(REGISTRATION_ENDPOINT))
             .willReturn(aResponse()
@@ -68,7 +69,8 @@ public class AppWebClientImpTest extends SemkinTelegramBotApplicationTests {
         assertNotNull(result);
         assertTrue(result.isSuccess());
         assertTrue(result.getData().isPresent());
-        assertEquals(result.getData().get().name(), customerDto.name());
+        assertEquals(result.getData().get().firstName(), customerDto.firstName());
+        assertEquals(result.getData().get().username(), customerDto.username());
         assertEquals(result.getData().get().email(), customerDto.email());
         assertEquals(result.getData().get().password(), customerDto.password());
     }
@@ -76,7 +78,7 @@ public class AppWebClientImpTest extends SemkinTelegramBotApplicationTests {
     @Test
     public void whenRegisterCustomer_Fail() {
         // ARRANGE
-        CustomerDto customerDto = new CustomerDto(TEST, TEST, TEST);
+        CustomerDto customerDto = new CustomerDto(TEST_ID, TEST, TEST, TEST, TEST);
         stubFor(post(urlEqualTo(REGISTRATION_ENDPOINT))
             .willReturn(aResponse()
                 .withStatus(HttpStatus.BAD_REQUEST.value())

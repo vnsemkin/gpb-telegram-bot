@@ -11,6 +11,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 
 public class AppMapperTest {
+    private static final long TG_ID = 120198730L;
+    private static final String TG_USERNAME = "test";
     private static final String NAME = "John Doe";
     private static final String EMAIL = "john.doe@example.com";
     private static final String PASSWORD = "password123";
@@ -20,7 +22,9 @@ public class AppMapperTest {
     public void shouldMapCustomerToCustomerDto() {
         // ARRANGE
         Customer customer = new Customer();
-        customer.setName(NAME);
+        customer.setTgId(TG_ID);
+        customer.setFirstName(NAME);
+        customer.setUsername(TG_USERNAME);
         customer.setEmail(EMAIL);
         customer.setPassword(PASSWORD);
 
@@ -29,7 +33,9 @@ public class AppMapperTest {
 
         // ASSERT
         assertNotNull(customerDto);
-        assertEquals(NAME, customerDto.name());
+        assertEquals(TG_ID, customerDto.tgId());
+        assertEquals(NAME, customerDto.firstName());
+        assertEquals(TG_USERNAME, customerDto.username());
         assertEquals(EMAIL, customerDto.email());
         assertEquals(PASSWORD, customerDto.password());
     }
