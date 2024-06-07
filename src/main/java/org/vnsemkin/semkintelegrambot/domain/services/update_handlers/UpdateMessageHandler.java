@@ -13,13 +13,16 @@ import org.vnsemkin.semkintelegrambot.domain.services.reply_handlers.MessageHand
 import org.vnsemkin.semkintelegrambot.presentation.tg_client.TgInterfaceImp;
 
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @Slf4j
 @Service
 public final class UpdateMessageHandler implements UpdateHandler {
     private static final String COMMAND_DELIMITER = "/";
-    private static final String NOT_IMPLEMENTED = "Функция в разработке";
+    private static final String NEW_LINE = "\n";
+    private static final String NOT_IMPLEMENTED = "Не понял запрос. Введите команду:" + NEW_LINE;
+    private static final String COMMAND_NOT_IMPLEMENTED = "Нет же такой команды";
     private final Map<String, CommandHandler> commandHandlers;
     private final Map<String, MessageHandler> messageHandlers;
     private final Map<Long, String> messageIdToServiceMap;
@@ -43,11 +46,11 @@ public final class UpdateMessageHandler implements UpdateHandler {
         }
         final Message message = update.getMessage();
         if (message.hasText()) {
-            checkIfCommandElseReply(message);
+            handleMessage(message);
         }
     }
 
-    private void checkIfCommandElseReply(@NotNull Message message) {
+    private void handleMessage(@NotNull Message message) {
         String text = message.getText();
         Long chatId = message.getChatId();
         if (text.startsWith(COMMAND_DELIMITER)) {
@@ -77,10 +80,13 @@ public final class UpdateMessageHandler implements UpdateHandler {
     }
 
     private void defaultCommandHandler(long chatId) {
-        tgSenderImp.sendText(chatId, NOT_IMPLEMENTED);
+        tgSenderImp.sendText(chatId, COMMAND_NOT_IMPLEMENTED);
     }
 
     private void defaultMessageHandler(long chatId) {
-        tgSenderImp.sendText(chatId, NOT_IMPLEMENTED);
+        String commands = commandHandlers.keySet().stream()
+            .map(key -> COMMAND_DELIMITER + key)
+            .collect(Collectors.joining(NEW_LINE));
+        tgSenderImp.sendText(chatId, NOT_IMPLEMENTED + commands);
     }
 }

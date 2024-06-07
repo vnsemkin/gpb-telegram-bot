@@ -10,24 +10,24 @@ public final class AppValidator {
     private static final String NOT_VALID_EMAIL = "Неправильный формат email";
     private static final String NOT_VALID_PASSWORD = "Неправильный формат пароля";
 
-    public Result<Boolean> validateName(@NonNull String name) {
+    public Result<Boolean, String> validateName(@NonNull String name) {
         if (name.matches("^[a-zA-Zа-яА-Я]+$") && name.length() <= 10) {
             return Result.success(true);
         }
-        return Result.failure(new RuntimeException(NOT_VALID_NAME));
+        return Result.error(NOT_VALID_NAME);
     }
 
-    public Result<Boolean> validateEmail(@NonNull String email) {
-        if (email.matches("[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+") && email.length() <= 50) {
+    public Result<Boolean, String> validateEmail(@NonNull String email) {
+        if (email.matches("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$") && email.length() <= 50) {
             return Result.success(true);
         }
-        return Result.failure(new RuntimeException(NOT_VALID_EMAIL));
+        return Result.error(NOT_VALID_EMAIL);
     }
 
-    public Result<Boolean> validatePassword(@NonNull String password) {
+    public Result<Boolean, String> validatePassword(@NonNull String password) {
         if (password.length() >= 5 && password.length() <= 10) {
             return Result.success(true);
         }
-        return Result.failure(new RuntimeException(NOT_VALID_PASSWORD));
+        return Result.error(NOT_VALID_PASSWORD);
     }
 }
