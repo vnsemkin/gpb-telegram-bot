@@ -1,0 +1,8 @@
+# Spring
+spring.application.name: "semkin-telegram-bot"
+middle-service.base-url: "http://localhost:8080"
+spring.profiles.active: test
+
+# Telegram
+telegram.gpb-bot.name: "GPB IT Factory Backend 2024"
+telegram.gpb-bot.token: ${TELEGRAM_GPB_BOT_TOKEN}

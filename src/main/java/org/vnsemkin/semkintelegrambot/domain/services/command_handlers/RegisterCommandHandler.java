@@ -3,7 +3,8 @@ package org.vnsemkin.semkintelegrambot.domain.services.command_handlers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.vnsemkin.semkintelegrambot.domain.constants.CommandToServiceMap;
-import org.vnsemkin.semkintelegrambot.domain.services.reply_handlers.RegistrationService;
+import org.vnsemkin.semkintelegrambot.domain.services.reply_handlers.registration.RegistrationService;
+
 
 @Service
 @RequiredArgsConstructor

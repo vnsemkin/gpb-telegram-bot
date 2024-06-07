@@ -6,6 +6,6 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.vnsemkin.semkintelegrambot.domain.models.Result;
 
 public interface TgInterface {
-    Result<Message> sendText(long chatId, @NonNull String text);
-    Result<Message> sendSendMessage(@NonNull SendMessage sm);
+    Result<Message, String> sendText(long chatId, @NonNull String text);
+    Result<Message, String> sendSendMessage(@NonNull SendMessage sm);
 }

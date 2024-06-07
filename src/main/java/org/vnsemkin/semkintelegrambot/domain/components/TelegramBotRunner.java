@@ -10,7 +10,7 @@ import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 @Component
 @RequiredArgsConstructor
-public class TelegramBotRunner {
+public final class TelegramBotRunner {
     private final TelegramBot bot;
 
     @EventListener(ApplicationReadyEvent.class)
@@ -19,4 +19,3 @@ public class TelegramBotRunner {
             .registerBot(bot);
     }
 }
-

@@ -23,25 +23,25 @@ public final class TgInterfaceImp extends DefaultAbsSender implements TgInterfac
         super(new DefaultBotOptions(), token);
     }
 
-    public Result<Message> sendText
+    public Result<Message, String> sendText
         (long chatId, @NonNull String text) {
         SendMessage sendMessage =
             new SendMessage(Long.toString(chatId), text);
         return send(sendMessage);
     }
 
-    public Result<Message> sendSendMessage(@NonNull SendMessage sm) {
+    public Result<Message, String> sendSendMessage(@NonNull SendMessage sm) {
         return send(sm);
     }
 
-    private Result<Message> send(@NonNull Object obj) {
+    private Result<Message, String> send(@NonNull Object obj) {
         if (obj instanceof SendMessage sendMessage) {
             sendMessage.setParseMode(HTML_MARKUP);
             try {
                 return Result.success(execute(sendMessage));
             } catch (TelegramApiException e) {
                 log.error(e.getMessage());
-                return Result.failure(e);
+                return Result.error(e.getMessage());
             }
         } else {
             log.info(NOT_IMPLEMENTED);
