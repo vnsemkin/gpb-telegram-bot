@@ -1,6 +1,5 @@
 package org.vnsemkin.semkintelegrambot.domain.services.update_handlers;
 
-
 import jakarta.validation.constraints.NotNull;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +14,6 @@ import org.vnsemkin.semkintelegrambot.presentation.tg_client.TgSenderInterfaceIm
 import java.util.Map;
 import java.util.stream.Collectors;
 
-
 @Slf4j
 @Service
 public final class UpdateMessageHandler implements UpdateHandler {
@@ -23,24 +21,24 @@ public final class UpdateMessageHandler implements UpdateHandler {
     private static final String NEW_LINE = "\n";
     private static final String NOT_IMPLEMENTED = "Не понял запрос. Введите команду:" + NEW_LINE;
     private static final String COMMAND_NOT_IMPLEMENTED = "Нет же такой команды";
+    @Qualifier("commandHandlers")
     private final Map<String, CommandHandler> commandHandlers;
+    @Qualifier("messageHandlers")
     private final Map<String, MessageHandler> messageHandlers;
-    private final Map<Long, String> messageIdToServiceMap;
-    private final TgSenderInterfaceImp tgSenderImp;
+    private final Map<Long, String> messageHandlerServiceMap;
+    private final TgSenderInterfaceImp sender;
 
     public UpdateMessageHandler(@Qualifier("commandHandlers") Map<String, CommandHandler> commandHandlers,
                                 @Qualifier("messageHandlers") Map<String, MessageHandler> messageHandlers,
-                                Map<Long, String> messageIdToServiceMap,
-                                TgSenderInterfaceImp tgSenderImp) {
+                                Map<Long, String> messageHandlerServiceMap, TgSenderInterfaceImp sender) {
         this.commandHandlers = commandHandlers;
         this.messageHandlers = messageHandlers;
-        this.messageIdToServiceMap = messageIdToServiceMap;
-        this.tgSenderImp = tgSenderImp;
+        this.messageHandlerServiceMap = messageHandlerServiceMap;
+        this.sender = sender;
     }
 
-
     @Override
-    public void handle(@NonNull Update update) {
+    public void handleUpdate(@NonNull Update update) {
         if (update.getMessage() == null) {
             return;
         }
@@ -70,7 +68,7 @@ public final class UpdateMessageHandler implements UpdateHandler {
     }
 
     private void handleReply(Message message) {
-        String service = messageIdToServiceMap.get(message.getChatId());
+        String service = messageHandlerServiceMap.get(message.getChatId());
         if (service == null) {
             defaultMessageHandler(message.getChatId());
         } else {
@@ -79,7 +77,7 @@ public final class UpdateMessageHandler implements UpdateHandler {
     }
 
     private void defaultCommandHandler(long chatId) {
-        tgSenderImp.sendText(chatId,
+        sender.sendText(chatId,
             COMMAND_NOT_IMPLEMENTED);
     }
 
@@ -87,6 +85,6 @@ public final class UpdateMessageHandler implements UpdateHandler {
         String commands = commandHandlers.keySet().stream()
             .map(key -> COMMAND_DELIMITER + key)
             .collect(Collectors.joining(NEW_LINE));
-        tgSenderImp.sendText(chatId, NOT_IMPLEMENTED + commands);
+        sender.sendText(chatId, NOT_IMPLEMENTED + commands);
     }
 }

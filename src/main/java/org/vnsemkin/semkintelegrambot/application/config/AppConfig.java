@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Configuration
 public class AppConfig {
     @Bean
-    public Map<Long, String> messageIdToServiceMap() {
+    public Map<Long, String> messageHandlerServiceMap() {
         return new ConcurrentHashMap<>();
     }
 

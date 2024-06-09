@@ -1,29 +1,29 @@
 package org.vnsemkin.semkintelegrambot.domain.services.command_handlers;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.vnsemkin.semkintelegrambot.application.constants.CommandToServiceMap;
 import org.vnsemkin.semkintelegrambot.application.externals.TgSenderInterface;
-import org.vnsemkin.semkintelegrambot.presentation.tg_client.TgSenderInterfaceImp;
 
-@Slf4j
+import java.util.Map;
+
+import static org.vnsemkin.semkintelegrambot.application.constants.AppConstants.NOT_IMPLEMENTED;
+
 @Service
-public final class PingCommandHandler implements CommandHandler {
+@RequiredArgsConstructor
+public class CurrentBalanceCommandHandler implements CommandHandler{
     private final TgSenderInterface tgSenderInterface;
-    private static final String PONG_ANSWER = "pong";
-
-    public PingCommandHandler(TgSenderInterfaceImp tgSenderImp) {
-        this.tgSenderInterface = tgSenderImp;
-    }
+    private final Map<Long, String> messageHandlerServiceMap;
 
     @Override
     public void handle(Message message) {
-        tgSenderInterface.sendText(message.getChatId(), PONG_ANSWER);
+        messageHandlerServiceMap.remove(message.getChatId());
+        tgSenderInterface.sendText(message.getChatId(), NOT_IMPLEMENTED);
     }
 
     @Override
     public String getHandlerName() {
-        return CommandToServiceMap.PING.value;
+        return CommandToServiceMap.CURRENT_BALANCE.value;
     }
 }

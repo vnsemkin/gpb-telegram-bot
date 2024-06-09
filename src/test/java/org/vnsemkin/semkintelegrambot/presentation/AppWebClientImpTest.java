@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.vnsemkin.semkintelegrambot.SemkinTelegramBotApplicationTests;
-import org.vnsemkin.semkintelegrambot.application.dtos.CustomerDto;
+import org.vnsemkin.semkintelegrambot.application.dtos.CustomerRegistrationDto;
 import org.vnsemkin.semkintelegrambot.domain.models.Result;
 import org.vnsemkin.semkintelegrambot.presentation.web_client.AppWebClientImp;
 
@@ -25,11 +25,12 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+
 public class AppWebClientImpTest extends SemkinTelegramBotApplicationTests {
     private final static long TEST_ID = 1278387L;
     private final static String TEST = "Test";
     private final static String ERROR = "Error";
-    private final static String REGISTRATION_ENDPOINT = "/registration";
+    private final static String REGISTRATION_ENDPOINT = "/customers";
     private final static String BASE_URL = "http://localhost:";
 
     @Autowired
@@ -54,17 +55,16 @@ public class AppWebClientImpTest extends SemkinTelegramBotApplicationTests {
 
     @Test
     public void whenRegisterCustomer_Success() throws JsonProcessingException {
-        // ARRANGE
-        CustomerDto customerDto = new CustomerDto(TEST_ID, TEST, TEST, TEST, TEST);
+        CustomerRegistrationDto customerDto = new CustomerRegistrationDto(TEST_ID, TEST, TEST, TEST, TEST);
         String customerJson = objectMapper.writeValueAsString(customerDto);
         stubFor(post(urlEqualTo(REGISTRATION_ENDPOINT))
             .willReturn(aResponse()
                 .withStatus(HttpStatus.CREATED.value())
                 .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
                 .withBody(customerJson)));
-        // ACT
-        Result<CustomerDto, String> result = webClient.registerCustomer(customerDto);
-        //ASSERT
+
+        Result<CustomerRegistrationDto, String> result = webClient.registerCustomer(customerDto);
+
         verify(postRequestedFor(urlEqualTo(REGISTRATION_ENDPOINT)));
         assertNotNull(result);
         assertTrue(result.isSuccess());
@@ -77,15 +77,14 @@ public class AppWebClientImpTest extends SemkinTelegramBotApplicationTests {
 
     @Test
     public void whenRegisterCustomer_Fail() {
-        // ARRANGE
-        CustomerDto customerDto = new CustomerDto(TEST_ID, TEST, TEST, TEST, TEST);
+        CustomerRegistrationDto customerDto = new CustomerRegistrationDto(TEST_ID, TEST, TEST, TEST, TEST);
         stubFor(post(urlEqualTo(REGISTRATION_ENDPOINT))
             .willReturn(aResponse()
                 .withStatus(HttpStatus.BAD_REQUEST.value())
                 .withBody(ERROR)));
-        // ACT
-        Result<CustomerDto, String> result = webClient.registerCustomer(customerDto);
-        //ASSERT
+
+        Result<CustomerRegistrationDto, String> result = webClient.registerCustomer(customerDto);
+
         verify(postRequestedFor(urlEqualTo(REGISTRATION_ENDPOINT)));
         assertNotNull(result);
         assertTrue(result.isError());
