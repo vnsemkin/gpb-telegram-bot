@@ -1,12 +1,9 @@
 package org.vnsemkin.semkintelegrambot;
 
-import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
-public class SemkinTelegramBotApplicationTests {
-
-	@Test
-	void contextLoads() {
-	}
+@ActiveProfiles("test")
+public abstract class SemkinTelegramBotApplicationTests {
 }

@@ -4,25 +4,24 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.vnsemkin.semkintelegrambot.application.constants.CommandToServiceMap;
-import org.vnsemkin.semkintelegrambot.domain.services.reply_handlers.customer.CustomerRegistrationService;
+import org.vnsemkin.semkintelegrambot.domain.services.reply_handlers.account.AccountInfoService;
 
 import java.util.Map;
 
-
 @Service
 @RequiredArgsConstructor
-public final class RegisterCommandHandler implements CommandHandler {
-    private final CustomerRegistrationService customerRegistrationService;
+public class CurrentBalanceCommandHandler implements CommandHandler{
     private final Map<Long, String> messageHandlerServiceMap;
+    private final AccountInfoService accountInfoService;
 
     @Override
     public void handle(Message message) {
         messageHandlerServiceMap.remove(message.getChatId());
-        customerRegistrationService.startRegistration(message);
+        accountInfoService.handle(message);
     }
 
     @Override
     public String getHandlerName() {
-        return CommandToServiceMap.REGISTER.value;
+        return CommandToServiceMap.CURRENT_BALANCE.value;
     }
 }

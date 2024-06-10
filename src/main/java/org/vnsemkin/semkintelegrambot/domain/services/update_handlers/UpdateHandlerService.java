@@ -16,7 +16,7 @@ public final class UpdateHandlerService {
 
     public void handle(Update update) {
         for (UpdateHandler handler : updateHandlers) {
-            handler.handle(update);
+            handler.handleUpdate(update);
         }
     }
 }

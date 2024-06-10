@@ -2,7 +2,7 @@ package org.vnsemkin.semkintelegrambot.mapper;
 
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
-import org.vnsemkin.semkintelegrambot.application.dtos.CustomerDto;
+import org.vnsemkin.semkintelegrambot.application.dtos.CustomerRegistrationDto;
 import org.vnsemkin.semkintelegrambot.application.mappers.AppMapper;
 import org.vnsemkin.semkintelegrambot.domain.models.Customer;
 
@@ -20,18 +20,12 @@ public class AppMapperTest {
 
     @Test
     public void shouldMapCustomerToCustomerDto() {
-        // ARRANGE
-        Customer customer = new Customer();
-        customer.setTgId(TG_ID);
-        customer.setFirstName(NAME);
-        customer.setUsername(TG_USERNAME);
+        Customer customer = new Customer(TG_ID, NAME, TG_USERNAME);
         customer.setEmail(EMAIL);
         customer.setPassword(PASSWORD);
 
-        // ACT
-        CustomerDto customerDto = mapper.toDto(customer);
+        CustomerRegistrationDto customerDto = mapper.toDto(customer);
 
-        // ASSERT
         assertNotNull(customerDto);
         assertEquals(TG_ID, customerDto.tgId());
         assertEquals(NAME, customerDto.firstName());

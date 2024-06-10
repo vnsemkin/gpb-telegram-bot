@@ -55,7 +55,7 @@ public class UpdateMessageHandlerTest {
         Update update = mock(Update.class);
         when(update.getMessage()).thenReturn(null);
 
-        updateMessageHandler.handle(update);
+        updateMessageHandler.handleUpdate(update);
 
         verifyNoInteractions(tgSenderImp);
     }
@@ -72,7 +72,7 @@ public class UpdateMessageHandlerTest {
         CommandHandler commandHandler = mock(CommandHandler.class);
         when(commandHandlers.get("start")).thenReturn(commandHandler);
 
-        updateMessageHandler.handle(update);
+        updateMessageHandler.handleUpdate(update);
 
         verify(commandHandler).handle(message);
         verifyNoMoreInteractions(tgSenderImp);
@@ -89,7 +89,7 @@ public class UpdateMessageHandlerTest {
 
         when(commandHandlers.get("invalid")).thenReturn(null);
 
-        updateMessageHandler.handle(update);
+        updateMessageHandler.handleUpdate(update);
 
         verify(tgSenderImp).sendText(CHAT_ID, "Нет же такой команды");
     }
@@ -107,7 +107,7 @@ public class UpdateMessageHandlerTest {
         MessageHandler messageHandler = mock(MessageHandler.class);
         when(messageHandlers.get("someService")).thenReturn(messageHandler);
 
-        updateMessageHandler.handle(update);
+        updateMessageHandler.handleUpdate(update);
 
         verify(messageHandler).handle(message);
         verifyNoMoreInteractions(tgSenderImp);
@@ -124,7 +124,7 @@ public class UpdateMessageHandlerTest {
 
         when(messageIdToServiceMap.get(CHAT_ID)).thenReturn(null);
 
-        updateMessageHandler.handle(update);
+        updateMessageHandler.handleUpdate(update);
 
         verify(tgSenderImp).sendText(anyLong(), contains("Не понял запрос. Введите команду:"));
     }

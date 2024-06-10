@@ -14,7 +14,7 @@ public final class UpdateCallbackQueryHandler implements UpdateHandler {
     private static final String UNDERSCORE = "_";
 
     @Override
-    public void handle(Update update) {
+    public void handleUpdate(Update update) {
         if (update.getCallbackQuery() == null) {
             return;
         }
