@@ -12,7 +12,6 @@ import org.vnsemkin.semkintelegrambot.application.externals.TgSenderInterface;
 import org.vnsemkin.semkintelegrambot.application.externals.AppWebClient;
 import org.vnsemkin.semkintelegrambot.domain.models.Customer;
 import org.vnsemkin.semkintelegrambot.domain.models.Result;
-import org.vnsemkin.semkintelegrambot.domain.services.reply_handlers.customer.UserStateHandler;
 import org.vnsemkin.semkintelegrambot.domain.utils.AppValidator;
 
 import java.util.Map;

@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.vnsemkin.semkintelegrambot.application.dtos.AccountDto;
 import org.vnsemkin.semkintelegrambot.application.dtos.AccountRegistrationRequest;
 import org.vnsemkin.semkintelegrambot.application.dtos.AccountRegistrationResponse;
 import org.vnsemkin.semkintelegrambot.application.dtos.CustomerInfoResponse;
@@ -14,9 +15,9 @@ import reactor.core.publisher.Mono;
 
 @Component
 public final class AppWebClientImp implements AppWebClient {
-    private final static String CUSTOMER_REG_ENDPOINT = "/customers";
+    private final static String CUSTOMERS_ENDPOINT = "/customers";
     private final static String CUSTOMER_INFO_ENDPOINT = "/customers/%d";
-    private final static String ACCOUNT_REG_ENDPOINT = "/customers/%d/accounts";
+    private final static String ACCOUNTS_ENDPOINT = "/customers/%d/accounts";
     private final WebClient webClient;
 
     public AppWebClientImp(WebClient.Builder webClientBuilder,
@@ -27,7 +28,7 @@ public final class AppWebClientImp implements AppWebClient {
     public Result<CustomerRegistrationDto, String> registerCustomer(CustomerRegistrationDto customerDto) {
         return webClient
             .post()
-            .uri(CUSTOMER_REG_ENDPOINT)
+            .uri(CUSTOMERS_ENDPOINT)
             .body(BodyInserters.fromValue(customerDto))
             .exchangeToMono(response ->
                 response.statusCode().is2xxSuccessful() ?
@@ -43,7 +44,7 @@ public final class AppWebClientImp implements AppWebClient {
     public Result<AccountRegistrationResponse, String> registerAccount(AccountRegistrationRequest request) {
         return webClient
             .post()
-            .uri(String.format(ACCOUNT_REG_ENDPOINT, request.tgId()))
+            .uri(String.format(ACCOUNTS_ENDPOINT, request.tgId()))
             .exchangeToMono(response ->
                 response.statusCode().is2xxSuccessful() ?
                     response.bodyToMono(AccountRegistrationResponse.class)
@@ -65,6 +66,21 @@ public final class AppWebClientImp implements AppWebClient {
                         .map(Result::<CustomerInfoResponse, String>success) :
                     response.bodyToMono(String.class)
                         .map(Result::<CustomerInfoResponse, String>error))
+            .onErrorResume(throwable ->
+                Mono.just(Result.error(throwable.getMessage())))
+            .block();
+    }
+
+    public Result<AccountDto, String> getCustomerAccount(long tgId) {
+        return webClient
+            .get()
+            .uri(String.format(ACCOUNTS_ENDPOINT, tgId))
+            .exchangeToMono(response ->
+                response.statusCode().is2xxSuccessful() ?
+                    response.bodyToMono(AccountDto.class)
+                        .map(Result::<AccountDto, String>success) :
+                    response.bodyToMono(String.class)
+                        .map(Result::<AccountDto, String>error))
             .onErrorResume(throwable ->
                 Mono.just(Result.error(throwable.getMessage())))
             .block();

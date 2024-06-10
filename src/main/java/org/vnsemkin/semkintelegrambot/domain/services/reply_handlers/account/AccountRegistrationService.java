@@ -11,29 +11,23 @@ import org.vnsemkin.semkintelegrambot.application.externals.TgSenderInterface;
 import org.vnsemkin.semkintelegrambot.domain.models.Result;
 import org.vnsemkin.semkintelegrambot.domain.services.reply_handlers.MessageHandler;
 
-import java.util.Map;
-
 @Service
 @RequiredArgsConstructor
 public class AccountRegistrationService implements MessageHandler {
     private final static String ACCOUNT_CREATED = "Счет успешно открыт ";
     private final static String SMT_WRONG = "Что-то пошло не так. Попробуйте позднее.";
     private final static String NEW_LINE = "\n";
-    private final Map<Long, String> messageHandlerServiceMap;
     private final AppWebClient appWebClient;
     private final TgSenderInterface sender;
 
     @Override
     public void handle(Message message) {
         Long chatId = message.getChat().getId();
-        messageHandlerServiceMap.computeIfAbsent(chatId, k ->
-            getHandlerName());
         Result<AccountRegistrationResponse, String> accountRegistrationResult =
             appWebClient.registerAccount(new AccountRegistrationRequest(message.getChat().getId()));
         String result = accountRegistrationResult.isSuccess() ?
             accountCreated(accountRegistrationResult) : accountCreationError(accountRegistrationResult);
-        sender.sendText(message.getChat().getId(), result);
-        cleanMessageHandlerServiceMap(chatId);
+        sender.sendText(chatId, result);
     }
 
     private String accountCreated(Result<AccountRegistrationResponse, String> result) {
@@ -54,8 +48,5 @@ public class AccountRegistrationService implements MessageHandler {
     @Override
     public String getHandlerName() {
         return CommandToServiceMap.CREATE_ACCOUNT.value;
-    }
-    private void cleanMessageHandlerServiceMap(long chatId) {
-        messageHandlerServiceMap.remove(chatId);
     }
 }

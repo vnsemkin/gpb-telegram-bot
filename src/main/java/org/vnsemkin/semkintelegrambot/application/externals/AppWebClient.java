@@ -1,5 +1,6 @@
 package org.vnsemkin.semkintelegrambot.application.externals;
 
+import org.vnsemkin.semkintelegrambot.application.dtos.AccountDto;
 import org.vnsemkin.semkintelegrambot.application.dtos.AccountRegistrationRequest;
 import org.vnsemkin.semkintelegrambot.application.dtos.AccountRegistrationResponse;
 import org.vnsemkin.semkintelegrambot.application.dtos.CustomerInfoResponse;
@@ -10,4 +11,5 @@ public interface AppWebClient {
    Result<CustomerRegistrationDto, String> registerCustomer(CustomerRegistrationDto customerDto);
    Result<AccountRegistrationResponse, String> registerAccount(AccountRegistrationRequest request);
    Result<CustomerInfoResponse, String> getCustomerInfo(long tgId);
+   Result<AccountDto, String> getCustomerAccount(long tgId);
 }

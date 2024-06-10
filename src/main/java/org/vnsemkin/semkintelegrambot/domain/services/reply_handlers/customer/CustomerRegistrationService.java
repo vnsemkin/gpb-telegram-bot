@@ -26,9 +26,16 @@ import java.util.Map;
 @RequiredArgsConstructor
 public final class CustomerRegistrationService implements MessageHandler {
     private static final String INPUT_EMAIL = "Введите email";
+    private static final String CUSTOMER_PREFIX = "Пользователь: ";
+    private static final String CUSTOMER_ALREADY_REGISTER = " уже зарегистрирован !";
+    private static final String EMAIL_PREFIX = "Email: ";
+    private static final String USERNAME_PREFIX = "Username: ";
+    private static final String ACCOUNT_PREFIX = "Счет: ";
     private static final String INPUT_PASSWORD = "Введите пароль";
+    private static final String ACCOUNT_NOT_OPEN = "Счет не открыт ! ";
     private static final String SPACE = " ";
     private static final String NEW_LINE = "\n";
+    private static final String DELIMITER_LINE = "-------------------";
     private static final String HELLO = "Привет ";
     private static final String EMAIL = "Email: ";
     private static final String PASSWORD = "Пароль: ";
@@ -145,13 +152,15 @@ public final class CustomerRegistrationService implements MessageHandler {
     }
 
     private String getCustomerInfoMessage(CustomerInfoResponse response) {
-        String account = response.accountName() == null ? "Счет не открыт ! " : response.accountName();
+        String account = response.accountName() == null ? ACCOUNT_NOT_OPEN : response.accountName();
         return new StringBuilder()
-            .append("Пользователь: ").append(response.firstName()).append(NEW_LINE)
-            .append("Email: ").append(response.email()).append(NEW_LINE)
-            .append("Username: ").append(response.username()).append(NEW_LINE)
-            .append("Счет: ").append(account).append(NEW_LINE)
-            .append("Уже зарегистрирован !").toString();
+            .append(CUSTOMER_PREFIX).append(response.firstName()).append(NEW_LINE)
+            .append(CUSTOMER_ALREADY_REGISTER).append(NEW_LINE)
+            .append(DELIMITER_LINE).append(NEW_LINE)
+            .append(EMAIL_PREFIX).append(response.email()).append(NEW_LINE)
+            .append(USERNAME_PREFIX).append(response.username()).append(NEW_LINE)
+            .append(ACCOUNT_PREFIX).append(account).append(NEW_LINE)
+            .toString();
     }
 
     @Override

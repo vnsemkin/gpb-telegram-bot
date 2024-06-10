@@ -4,22 +4,20 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.vnsemkin.semkintelegrambot.application.constants.CommandToServiceMap;
-import org.vnsemkin.semkintelegrambot.application.externals.TgSenderInterface;
+import org.vnsemkin.semkintelegrambot.domain.services.reply_handlers.account.AccountInfoService;
 
 import java.util.Map;
-
-import static org.vnsemkin.semkintelegrambot.application.constants.AppConstants.NOT_IMPLEMENTED;
 
 @Service
 @RequiredArgsConstructor
 public class CurrentBalanceCommandHandler implements CommandHandler{
-    private final TgSenderInterface tgSenderInterface;
     private final Map<Long, String> messageHandlerServiceMap;
+    private final AccountInfoService accountInfoService;
 
     @Override
     public void handle(Message message) {
         messageHandlerServiceMap.remove(message.getChatId());
-        tgSenderInterface.sendText(message.getChatId(), NOT_IMPLEMENTED);
+        accountInfoService.handle(message);
     }
 
     @Override
