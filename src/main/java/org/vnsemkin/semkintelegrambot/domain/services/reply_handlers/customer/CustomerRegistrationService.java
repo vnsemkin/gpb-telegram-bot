@@ -25,6 +25,7 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public final class CustomerRegistrationService implements MessageHandler {
+    private final static String CUSTOMER_NOT_FOUND = "Пользователь не найден";
     private static final String INPUT_EMAIL = "Введите email";
     private static final String CUSTOMER_PREFIX = "Пользователь: ";
     private static final String CUSTOMER_ALREADY_REGISTER = " уже зарегистрирован !";
@@ -67,6 +68,13 @@ public final class CustomerRegistrationService implements MessageHandler {
             sender.sendText(chatId, getCustomerInfoMessage(response));
             return;
         }
+        if(customerInfo.getError().isPresent()) {
+            if (!customerInfo.getError().get().equals(CUSTOMER_NOT_FOUND)) {
+                sender.sendText(chatId, customerInfo.getError().get());
+                return;
+            }
+        }
+
         customerLocal.set(new Customer(user.getId(), user.getFirstName(), user.getUserName()));
         sender.sendSendMessage(createWelcomeMessage(chatId, user.getFirstName()));
         messageHandlerServiceMap.put(chatId, getHandlerName());
@@ -153,14 +161,12 @@ public final class CustomerRegistrationService implements MessageHandler {
 
     private String getCustomerInfoMessage(CustomerInfoResponse response) {
         String account = response.accountName() == null ? ACCOUNT_NOT_OPEN : response.accountName();
-        return new StringBuilder()
-            .append(CUSTOMER_PREFIX).append(response.firstName()).append(NEW_LINE)
-            .append(CUSTOMER_ALREADY_REGISTER).append(NEW_LINE)
-            .append(DELIMITER_LINE).append(NEW_LINE)
-            .append(EMAIL_PREFIX).append(response.email()).append(NEW_LINE)
-            .append(USERNAME_PREFIX).append(response.username()).append(NEW_LINE)
-            .append(ACCOUNT_PREFIX).append(account).append(NEW_LINE)
-            .toString();
+        return CUSTOMER_PREFIX + response.firstName() + NEW_LINE +
+            CUSTOMER_ALREADY_REGISTER + NEW_LINE +
+            DELIMITER_LINE + NEW_LINE +
+            EMAIL_PREFIX + response.email() + NEW_LINE +
+            USERNAME_PREFIX + response.username() + NEW_LINE +
+            ACCOUNT_PREFIX + account + NEW_LINE;
     }
 
     @Override

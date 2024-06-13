@@ -12,7 +12,6 @@ import org.springframework.http.MediaType;
 import org.vnsemkin.semkintelegrambot.SemkinTelegramBotApplicationTests;
 import org.vnsemkin.semkintelegrambot.application.dtos.CustomerRegistrationDto;
 import org.vnsemkin.semkintelegrambot.domain.models.Result;
-import org.vnsemkin.semkintelegrambot.presentation.web_client.AppWebClientImp;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
@@ -34,7 +33,7 @@ public class AppWebClientImpTest extends SemkinTelegramBotApplicationTests {
     private final static String BASE_URL = "http://localhost:";
 
     @Autowired
-    AppWebClientImp webClient;
+    App webClient;
     @Autowired
     ObjectMapper objectMapper;
 

@@ -1,6 +1,7 @@
 package org.vnsemkin.semkintelegrambot.presentation.web_client;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -9,6 +10,8 @@ import org.vnsemkin.semkintelegrambot.application.dtos.AccountRegistrationReques
 import org.vnsemkin.semkintelegrambot.application.dtos.AccountRegistrationResponse;
 import org.vnsemkin.semkintelegrambot.application.dtos.CustomerInfoResponse;
 import org.vnsemkin.semkintelegrambot.application.dtos.CustomerRegistrationDto;
+import org.vnsemkin.semkintelegrambot.application.dtos.TransferMoneyRequest;
+import org.vnsemkin.semkintelegrambot.application.dtos.TransferMoneyResponse;
 import org.vnsemkin.semkintelegrambot.application.externals.AppWebClient;
 import org.vnsemkin.semkintelegrambot.domain.models.Result;
 import reactor.core.publisher.Mono;
@@ -18,6 +21,7 @@ public final class AppWebClientImp implements AppWebClient {
     private final static String CUSTOMERS_ENDPOINT = "/customers";
     private final static String CUSTOMER_INFO_ENDPOINT = "/customers/%d";
     private final static String ACCOUNTS_ENDPOINT = "/customers/%d/accounts";
+    private final static String TRANSFER_MONEY_ENDPOINT = "/transfers";
     private final WebClient webClient;
 
     public AppWebClientImp(WebClient.Builder webClientBuilder,
@@ -29,6 +33,7 @@ public final class AppWebClientImp implements AppWebClient {
         return webClient
             .post()
             .uri(CUSTOMERS_ENDPOINT)
+            .contentType(MediaType.APPLICATION_JSON)
             .body(BodyInserters.fromValue(customerDto))
             .exchangeToMono(response ->
                 response.statusCode().is2xxSuccessful() ?
@@ -81,6 +86,23 @@ public final class AppWebClientImp implements AppWebClient {
                         .map(Result::<AccountDto, String>success) :
                     response.bodyToMono(String.class)
                         .map(Result::<AccountDto, String>error))
+            .onErrorResume(throwable ->
+                Mono.just(Result.error(throwable.getMessage())))
+            .block();
+    }
+
+    public Result<TransferMoneyResponse, String> transferMoney(TransferMoneyRequest request) {
+        return webClient
+            .post()
+            .uri(String.format(TRANSFER_MONEY_ENDPOINT))
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(BodyInserters.fromValue(request))
+            .exchangeToMono(response ->
+                response.statusCode().is2xxSuccessful() ?
+                    response.bodyToMono(TransferMoneyResponse.class)
+                        .map(Result::<TransferMoneyResponse, String>success) :
+                    response.bodyToMono(String.class)
+                        .map(Result::<TransferMoneyResponse, String>error))
             .onErrorResume(throwable ->
                 Mono.just(Result.error(throwable.getMessage())))
             .block();
