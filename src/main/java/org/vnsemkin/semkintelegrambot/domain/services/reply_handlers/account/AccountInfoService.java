@@ -36,10 +36,8 @@ public final class AccountInfoService implements MessageHandler {
     }
 
     private String getAccountInfoFormatedString(AccountDto account) {
-        return new StringBuilder()
-            .append(CUSTOMER_ACCOUNT).append(account.accountName()).append(NEW_LINE)
-            .append(ACCOUNT_BALANCE).append(account.balance())
-            .toString();
+        return CUSTOMER_ACCOUNT + account.accountName() + NEW_LINE +
+            ACCOUNT_BALANCE + account.balance();
     }
 
     private String getCustomerAccountError(Result<AccountDto, String> result) {
