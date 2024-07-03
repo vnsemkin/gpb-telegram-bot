@@ -43,11 +43,24 @@
         Telegram.WebApp.ready(); // Инициализация WebApp
 
         function sendCommand(command) {
-            // Устанавливаем текст главной кнопки
+            // Показываем главную кнопку
             Telegram.WebApp.MainButton.setText(command);
+            Telegram.WebApp.MainButton.show();
 
             // Обработчик нажатия на кнопку
             Telegram.WebApp.MainButton.onClick(() => {
+                Telegram.WebApp.sendData(command, (result) => {
+                    if (result.ok) {
+                        // Показываем всплывающее сообщение об отправке команды
+                        Telegram.WebApp.showPopup({
+                            title: "Команда отправлена",
+                            message: "Команда " + command + " отправлена боту."
+                        });
+                    } else {
+                        console.error("Ошибка отправки данных:", result.error);
+                    }
+                });
+
                 // Необязательно: закрываем веб-приложение после отправки команды
                 // Telegram.WebApp.close();
             });
