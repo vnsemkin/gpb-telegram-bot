@@ -29,20 +29,32 @@
         .button {
             display: inline-block;
             padding: 10px 20px;
-            margin-top: 20px;
+            margin: 10px 0;
             font-size: 16px;
             color: #fff;
             background-color: #007bff;
             text-decoration: none;
             border-radius: 5px;
+            cursor: pointer;
         }
     </style>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script>
+        function sendCommand(command) {
+            Telegram.WebApp.sendData(command);
+        }
+    </script>
 </head>
 <body>
 <div class="container">
     <h1>Добро пожаловать в Мини-банк</h1>
     <p>Ваш личный помощник в банковских услугах.</p>
-    <a class="button" href="https://t.me/your_bot_username">Начать пользоваться Мини-банком</a>
+    <div>
+        <div class="button" onclick="sendCommand('/register')">Зарегистрироваться</div>
+        <div class="button" onclick="sendCommand('/create_account')">Создать аккаунт</div>
+        <div class="button" onclick="sendCommand('/current_balance')">Вывести баланс</div>
+        <div class="button" onclick="sendCommand('/transfer')">Перевести деньги</div>
+    </div>
 </div>
 </body>
 </html>
