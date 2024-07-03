@@ -1,4 +1,0 @@
-# Spring
-spring:
-  application.name: telegram-bot
-  config.import: "optional:configserver:http://config-server:8099"
