@@ -40,10 +40,23 @@
     </style>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
-        Telegram.WebApp.ready();
+        Telegram.WebApp.ready(); // Инициализация WebApp
 
         function sendCommand(command) {
-            Telegram.WebApp.sendData(command);
+            // Устанавливаем текст главной кнопки
+            Telegram.WebApp.MainButton.setText(command);
+
+            // Обработчик нажатия на кнопку
+            Telegram.WebApp.MainButton.onClick(() => {
+                // Необязательно: закрываем веб-приложение после отправки команды
+                // Telegram.WebApp.close();
+            });
+
+            // Показываем всплывающее сообщение об отправке команды
+            Telegram.WebApp.showPopup({
+                title: "Команда отправлена",
+                message: "Команда " + command + " отправлена боту."
+            });
         }
     </script>
 </head>
