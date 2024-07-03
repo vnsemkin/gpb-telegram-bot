@@ -1,4 +1,6 @@
 package org.vnsemkin.semkintelegrambot.application.dtos;
 
-public record TransferMoneyResponse(String uuid) {
+import org.springframework.lang.NonNull;
+
+public record TransferMoneyResponse(@NonNull String uuid) {
 }

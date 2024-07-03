@@ -1,4 +1,6 @@
 package org.vnsemkin.semkintelegrambot.application.dtos;
 
-public record TransferMoneyRequest(String from, String to, String amount) {
+import org.springframework.lang.NonNull;
+
+public record TransferMoneyRequest(@NonNull String from, @NonNull String to, @NonNull String amount) {
 }

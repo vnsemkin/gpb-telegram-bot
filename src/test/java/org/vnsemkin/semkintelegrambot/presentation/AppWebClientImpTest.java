@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.vnsemkin.semkintelegrambot.SemkinTelegramBotApplicationTests;
 import org.vnsemkin.semkintelegrambot.application.dtos.CustomerRegistrationDto;
+import org.vnsemkin.semkintelegrambot.application.externals.AppWebClient;
 import org.vnsemkin.semkintelegrambot.domain.models.Result;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
@@ -33,7 +34,7 @@ public class AppWebClientImpTest extends SemkinTelegramBotApplicationTests {
     private final static String BASE_URL = "http://localhost:";
 
     @Autowired
-    App webClient;
+    AppWebClient webClient;
     @Autowired
     ObjectMapper objectMapper;
 
@@ -69,7 +70,7 @@ public class AppWebClientImpTest extends SemkinTelegramBotApplicationTests {
         assertTrue(result.isSuccess());
         assertTrue(result.getData().isPresent());
         assertEquals(result.getData().get().firstName(), customerDto.firstName());
-        assertEquals(result.getData().get().username(), customerDto.username());
+        assertEquals(result.getData().get().userName(), customerDto.userName());
         assertEquals(result.getData().get().email(), customerDto.email());
         assertEquals(result.getData().get().password(), customerDto.password());
     }

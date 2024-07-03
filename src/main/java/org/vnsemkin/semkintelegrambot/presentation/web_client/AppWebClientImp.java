@@ -2,6 +2,7 @@ package org.vnsemkin.semkintelegrambot.presentation.web_client;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -29,7 +30,7 @@ public final class AppWebClientImp implements AppWebClient {
         this.webClient = webClientBuilder.baseUrl(baseUrl).build();
     }
 
-    public Result<CustomerRegistrationDto, String> registerCustomer(CustomerRegistrationDto customerDto) {
+    public Result<CustomerRegistrationDto, String> registerCustomer(@NonNull CustomerRegistrationDto customerDto) {
         return webClient
             .post()
             .uri(CUSTOMERS_ENDPOINT)
@@ -46,7 +47,7 @@ public final class AppWebClientImp implements AppWebClient {
             .block();
     }
 
-    public Result<AccountRegistrationResponse, String> registerAccount(AccountRegistrationRequest request) {
+    public Result<AccountRegistrationResponse, String> registerAccount(@NonNull AccountRegistrationRequest request) {
         return webClient
             .post()
             .uri(String.format(ACCOUNTS_ENDPOINT, request.tgId()))
@@ -91,7 +92,7 @@ public final class AppWebClientImp implements AppWebClient {
             .block();
     }
 
-    public Result<TransferMoneyResponse, String> transferMoney(TransferMoneyRequest request) {
+    public Result<TransferMoneyResponse, String> transferMoney(@NonNull TransferMoneyRequest request) {
         return webClient
             .post()
             .uri(String.format(TRANSFER_MONEY_ENDPOINT))

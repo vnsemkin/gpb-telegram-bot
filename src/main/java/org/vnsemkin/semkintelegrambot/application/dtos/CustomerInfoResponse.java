@@ -1,4 +1,7 @@
 package org.vnsemkin.semkintelegrambot.application.dtos;
 
-public record CustomerInfoResponse(String firstName, String username, String email,
-                                   String uuid, String accountName) {}
+import org.springframework.lang.NonNull;
+
+public record CustomerInfoResponse(@NonNull String firstName, @NonNull String userName, @NonNull String email,
+                                   @NonNull String uuid, String accountName) {
+}

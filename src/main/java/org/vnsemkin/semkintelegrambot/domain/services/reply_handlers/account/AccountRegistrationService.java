@@ -1,6 +1,7 @@
 package org.vnsemkin.semkintelegrambot.domain.services.reply_handlers.account;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.vnsemkin.semkintelegrambot.application.constants.CommandToServiceMap;
@@ -21,16 +22,16 @@ public class AccountRegistrationService implements MessageHandler {
     private final TgSenderInterface sender;
 
     @Override
-    public void handle(Message message) {
-        Long chatId = message.getChat().getId();
+    public void handle(@NonNull Message message) {
+        long chatId = message.getChatId();
         Result<AccountRegistrationResponse, String> accountRegistrationResult =
-            appWebClient.registerAccount(new AccountRegistrationRequest(message.getChat().getId()));
+            appWebClient.registerAccount(new AccountRegistrationRequest(chatId));
         String result = accountRegistrationResult.isSuccess() ?
-            accountCreated(accountRegistrationResult) : accountCreationError(accountRegistrationResult);
+            accountCreationSuccess(accountRegistrationResult) : accountCreationError(accountRegistrationResult);
         sender.sendText(chatId, result);
     }
 
-    private String accountCreated(Result<AccountRegistrationResponse, String> result) {
+    private String accountCreationSuccess(@NonNull Result<AccountRegistrationResponse, String> result) {
         return result.getData().map(account -> ACCOUNT_CREATED +
                 NEW_LINE +
                 account.accountName() +
@@ -41,7 +42,7 @@ public class AccountRegistrationService implements MessageHandler {
             .orElse(SMT_WRONG);
     }
 
-    private String accountCreationError(Result<AccountRegistrationResponse, String> result) {
+    private String accountCreationError(@NonNull Result<AccountRegistrationResponse, String> result) {
         return result.getError().orElse(SMT_WRONG);
     }
 

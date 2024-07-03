@@ -1,6 +1,7 @@
 package org.vnsemkin.semkintelegrambot.domain.services.reply_handlers.account;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.vnsemkin.semkintelegrambot.application.constants.CommandToServiceMap;
@@ -21,26 +22,26 @@ public final class AccountInfoService implements MessageHandler {
     private final AppWebClient appWebClient;
 
     @Override
-    public void handle(Message message) {
+    public void handle(@NonNull Message message) {
         long chatId = message.getChatId();
         Long id = message.getFrom().getId();
         Result<AccountDto, String> result = appWebClient.getCustomerAccount(id);
         String response = result.isSuccess() ?
-            getCustomerAccountInfo(result) : getCustomerAccountError(result);
+            customerAccountInfoSuccess(result) : customerAccountInfoError(result);
         sender.sendText(chatId, response);
     }
 
-    private String getCustomerAccountInfo(Result<AccountDto, String> result) {
+    private String customerAccountInfoSuccess(@NonNull Result<AccountDto, String> result) {
         return result.getData()
             .map(this::getAccountInfoFormatedString).orElse(NO_INFO);
     }
 
-    private String getAccountInfoFormatedString(AccountDto account) {
+    private String getAccountInfoFormatedString(@NonNull AccountDto account) {
         return CUSTOMER_ACCOUNT + account.accountName() + NEW_LINE +
             ACCOUNT_BALANCE + account.balance();
     }
 
-    private String getCustomerAccountError(Result<AccountDto, String> result) {
+    private String customerAccountInfoError(@NonNull Result<AccountDto, String> result) {
         return result.getError().orElse(NO_INFO);
     }
 

@@ -1,4 +1,7 @@
 package org.vnsemkin.semkintelegrambot.application.dtos;
 
-public record CustomerRegistrationDto(long tgId, String firstName, String username, String email, String password) {
+import org.springframework.lang.NonNull;
+
+public record CustomerRegistrationDto(long tgId, @NonNull String firstName, @NonNull String userName,
+                                      @NonNull String email, @NonNull String password) {
 }

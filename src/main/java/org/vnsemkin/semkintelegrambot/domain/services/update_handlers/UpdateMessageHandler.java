@@ -56,7 +56,7 @@ public final class UpdateMessageHandler implements UpdateHandler {
         handleReply(message);
     }
 
-    private void handleCommand(Message message) {
+    private void handleCommand(@NonNull Message message) {
         String command = message.getText()
             .substring(COMMAND_DELIMITER.length());
         CommandHandler commandHandler = commandHandlers.get(command);
@@ -67,7 +67,7 @@ public final class UpdateMessageHandler implements UpdateHandler {
         }
     }
 
-    private void handleReply(Message message) {
+    private void handleReply(@NonNull Message message) {
         String service = messageHandlerServiceMap.get(message.getChatId());
         if (service == null) {
             defaultMessageHandler(message.getChatId());

@@ -26,6 +26,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public final class CustomerRegistrationService implements MessageHandler {
     private final static String CUSTOMER_NOT_FOUND = "Пользователь не найден";
+    private final static String SMT_WRG = "Что-то пошло не так (:";
     private static final String INPUT_EMAIL = "Введите email";
     private static final String CUSTOMER_PREFIX = "Пользователь: ";
     private static final String CUSTOMER_ALREADY_REGISTER = " уже зарегистрирован !";
@@ -42,7 +43,6 @@ public final class CustomerRegistrationService implements MessageHandler {
     private static final String PASSWORD = "Пароль: ";
     private static final String REG_SUCCESS = "Регистрация успешно завершена!";
     private static final String REG_FAIL = "Что то пошло не так. Попробуйте зарегистрироваться заново :(";
-    private static final String INPUT_NAME = "Введите email";
     private static final String ARROW_EMOJI = "⬇";
     private static final String BOLD_START_TAG = "<b>";
     private static final String BOLD_STOP_TAG = "</b>";
@@ -57,7 +57,6 @@ public final class CustomerRegistrationService implements MessageHandler {
     private final AppWebClient appWebClient;
     private final AppMapper mapper = AppMapper.INSTANCE;
     private final ThreadLocal<Customer> customerLocal = new ThreadLocal<>();
-    ;
 
     public void startRegistration(@NonNull Message message) {
         long chatId = message.getChatId();
@@ -68,13 +67,12 @@ public final class CustomerRegistrationService implements MessageHandler {
             sender.sendText(chatId, getCustomerInfoMessage(response));
             return;
         }
-        if(customerInfo.getError().isPresent()) {
+        if (customerInfo.getError().isPresent()) {
             if (!customerInfo.getError().get().equals(CUSTOMER_NOT_FOUND)) {
                 sender.sendText(chatId, customerInfo.getError().get());
                 return;
             }
         }
-
         customerLocal.set(new Customer(user.getId(), user.getFirstName(), user.getUserName()));
         sender.sendSendMessage(createWelcomeMessage(chatId, user.getFirstName()));
         messageHandlerServiceMap.put(chatId, getHandlerName());
@@ -82,7 +80,10 @@ public final class CustomerRegistrationService implements MessageHandler {
 
     @Override
     public void handle(@NonNull Message message) {
-        handleUserRegistrationState(message, customerLocal.get());
+        Customer customer = customerLocal.get();
+        if (customer != null) {
+            handleUserRegistrationState(message, customer);
+        }
     }
 
     private SendMessage createWelcomeMessage(long chatId, String firstName) {
@@ -90,12 +91,12 @@ public final class CustomerRegistrationService implements MessageHandler {
             REGISTER_INFO +
             BOLD_STOP_TAG +
             NEW_LINE +
-            INPUT_NAME +
+            INPUT_EMAIL +
             ARROW_EMOJI, firstName);
         return new SendMessage(Long.toString(chatId), welcomeMessage);
     }
 
-    private void handleUserRegistrationState(Message message, Customer customer) {
+    private void handleUserRegistrationState(@NonNull Message message, @NonNull Customer customer) {
         long chatId = message.getChatId();
         String text = message.getText();
         UserRegistrationState userState = getUserState(customer);
@@ -105,7 +106,7 @@ public final class CustomerRegistrationService implements MessageHandler {
         }
     }
 
-    private void handleEmailInput(long chatId, String text, Customer customer) {
+    private void handleEmailInput(long chatId, @NonNull String text, @NonNull Customer customer) {
         Result<Boolean, String> result = validator.validateEmail(text);
         if (result.isSuccess()) {
             customer.setEmail(text);
@@ -117,7 +118,7 @@ public final class CustomerRegistrationService implements MessageHandler {
         }
     }
 
-    private void handlePasswordInput(long chatId, String text, Customer customer) {
+    private void handlePasswordInput(long chatId, @NonNull String text, @NonNull Customer customer) {
         Result<Boolean, String> result = validator.validatePassword(text);
         if (result.isSuccess()) {
             customer.setPassword(text);
@@ -127,13 +128,19 @@ public final class CustomerRegistrationService implements MessageHandler {
         }
     }
 
-    private void registerCustomer(long chatId, Customer customer) {
+    private void registerCustomer(long chatId, @NonNull Customer customer) {
         Result<CustomerRegistrationDto, String> registrationResult =
             appWebClient.registerCustomer(mapper.toDto(customer));
         String message = registrationResult.isSuccess() ?
-            REG_SUCCESS : registrationResult.getError().orElse(REG_FAIL);
+            REG_SUCCESS : handleRegistrationError(registrationResult).getError().orElse(SMT_WRG);
         sender.sendText(chatId, message);
         cleanupRegistrationMaps(chatId);
+    }
+
+    private Result<CustomerRegistrationDto, String>
+    handleRegistrationError(Result<CustomerRegistrationDto, String> registrationResult){
+        log.error(registrationResult.getError().orElse(REG_FAIL));
+        return Result.error(SMT_WRG);
     }
 
     private String getErrorMessage(Result<Boolean, String> result, String defaultMsg) {
@@ -165,7 +172,7 @@ public final class CustomerRegistrationService implements MessageHandler {
             CUSTOMER_ALREADY_REGISTER + NEW_LINE +
             DELIMITER_LINE + NEW_LINE +
             EMAIL_PREFIX + response.email() + NEW_LINE +
-            USERNAME_PREFIX + response.username() + NEW_LINE +
+            USERNAME_PREFIX + response.userName() + NEW_LINE +
             ACCOUNT_PREFIX + account + NEW_LINE;
     }
 

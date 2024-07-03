@@ -1,4 +1,4 @@
-package org.vnsemkin.semkintelegrambot.mapper;
+package org.vnsemkin.semkintelegrambot.application.mapper;
 
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
@@ -8,7 +8,6 @@ import org.vnsemkin.semkintelegrambot.domain.models.Customer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 
 public class AppMapperTest {
     private static final long TG_ID = 120198730L;
@@ -26,10 +25,14 @@ public class AppMapperTest {
 
         CustomerRegistrationDto customerDto = mapper.toDto(customer);
 
+        checkCustomerMapper(customerDto);
+    }
+
+    private void checkCustomerMapper(CustomerRegistrationDto customerDto) {
         assertNotNull(customerDto);
         assertEquals(TG_ID, customerDto.tgId());
         assertEquals(NAME, customerDto.firstName());
-        assertEquals(TG_USERNAME, customerDto.username());
+        assertEquals(TG_USERNAME, customerDto.userName());
         assertEquals(EMAIL, customerDto.email());
         assertEquals(PASSWORD, customerDto.password());
     }

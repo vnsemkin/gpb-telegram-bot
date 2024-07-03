@@ -25,14 +25,14 @@ public class TransferMoneyService implements MessageHandler {
     private final static String USER_OR_ACCOUNT_NOT_EXIST = "Не найдет пользователь или аккаунт!";
     private final static String UNKNOWN_ERROR = "Неизвестная ошибка";
     private final static String TRANSFER_SUCCESSFUL = "Деньги успешно переведены!";
-    private final static String DEFAULT_ACCOUNT_NAME = "Дебетовый";
+    private final static String DEFAULT_ACCOUNT_NAME = "Акционный";
     private final static String NEW_LINE = "\n";
     private final Map<Long, String> messageHandlerServiceMap;
     private final TgSenderInterface sender;
     private final AppValidator validator;
     private final AppWebClient appWebClient;
 
-    public void startTransferMoneyProcess(Message message) {
+    public void startTransferMoneyProcess(@NonNull Message message) {
         Long chatId = message.getChatId();
         if (!checkUserExistAndHasAccount(chatId)) {
             sender.sendText(chatId, USER_OR_ACCOUNT_NOT_EXIST);
@@ -51,14 +51,14 @@ public class TransferMoneyService implements MessageHandler {
     }
 
     private void handleTransferMoneyResponse(long chatId,
-                                             Result<TransferMoneyResponse, String> transferMoneyResponse) {
+                                             @NonNull Result<TransferMoneyResponse, String> transferMoneyResponse) {
         transferMoneyResponse.getError().ifPresentOrElse(error ->
                 sender.sendText(chatId, error)
             , () -> sender.sendText(chatId, TRANSFER_SUCCESSFUL));
         messageHandlerServiceMap.remove(chatId);
     }
 
-    private Optional<TransferMoneyRequest> parseAndValidateAnswer(Message message) {
+    private Optional<TransferMoneyRequest> parseAndValidateAnswer(@NonNull Message message) {
         long chatId = message.getChatId();
         User fromUser = message.getFrom();
         String[] parts = message.getText().split(" ");
@@ -84,19 +84,19 @@ public class TransferMoneyService implements MessageHandler {
         return customerInfo.isSuccess() && checkAccountExist(customerInfo);
     }
 
-    private Result<TransferMoneyResponse, String> transferMoney(TransferMoneyRequest request) {
+    private Result<TransferMoneyResponse, String> transferMoney(@NonNull TransferMoneyRequest request) {
         return appWebClient.transferMoney(request);
     }
 
-    private boolean checkAccountExist(Result<CustomerInfoResponse, String> customerInfo) {
+    private boolean checkAccountExist(@NonNull Result<CustomerInfoResponse, String> customerInfo) {
         String accountName = customerInfo.getData()
             .map(CustomerInfoResponse::accountName).orElse(UNKNOWN_ERROR);
         return accountName.equals(DEFAULT_ACCOUNT_NAME);
     }
 
     private boolean validateTransferData(long chatId,
-                                         String toUser,
-                                         String amount) {
+                                         @NonNull String toUser,
+                                         @NonNull String amount) {
         Result<Boolean, String> result = validator.validateName(toUser);
         if (result.isError()) {
             sender.sendText(chatId, result.getError().orElse(UNKNOWN_ERROR));

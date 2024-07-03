@@ -1,4 +1,4 @@
-package org.vnsemkin.semkintelegrambot.services;
+package org.vnsemkin.semkintelegrambot.domain.services.update_handlers;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,7 +9,6 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.vnsemkin.semkintelegrambot.domain.services.command_handlers.CommandHandler;
 import org.vnsemkin.semkintelegrambot.domain.services.reply_handlers.MessageHandler;
-import org.vnsemkin.semkintelegrambot.domain.services.update_handlers.UpdateMessageHandler;
 import org.vnsemkin.semkintelegrambot.presentation.tg_client.TgSenderInterfaceImp;
 
 import java.util.Map;
