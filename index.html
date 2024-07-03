@@ -40,6 +40,8 @@
     </style>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
+        Telegram.WebApp.ready();
+
         function sendCommand(command) {
             Telegram.WebApp.sendData(command);
         }
