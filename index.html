@@ -60,9 +60,7 @@
                         console.error("Ошибка отправки данных:", result.error);
                     }
                 });
-
-                // Необязательно: закрываем веб-приложение после отправки команды
-                // Telegram.WebApp.close();
+              Telegram.WebApp.close();
             });
         }
     </script>
