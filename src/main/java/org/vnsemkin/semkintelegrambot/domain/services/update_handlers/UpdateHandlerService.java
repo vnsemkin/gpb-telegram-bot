@@ -16,6 +16,7 @@ public final class UpdateHandlerService {
     private final List<UpdateHandler> updateHandlers;
 
     public void handle(@NonNull Update update) {
+        System.out.println("Get update: " + update);
         for (UpdateHandler handler : updateHandlers) {
             handler.handleUpdate(update);
         }
