@@ -1,6 +1,7 @@
 package org.vnsemkin.semkintelegrambot.application.constants;
 
 public enum CommandToServiceMap {
+    WEBAPP("web_app"),
     REGISTER("register" ),
     CREATE_ACCOUNT("create_account" ),
     CURRENT_BALANCE("current_balance" ),
