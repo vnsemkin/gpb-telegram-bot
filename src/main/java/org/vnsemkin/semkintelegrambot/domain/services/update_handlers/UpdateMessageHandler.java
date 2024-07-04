@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.webapp.WebAppData;
 import org.vnsemkin.semkintelegrambot.domain.services.command_handlers.CommandHandler;
 import org.vnsemkin.semkintelegrambot.domain.services.reply_handlers.MessageHandler;
 import org.vnsemkin.semkintelegrambot.presentation.tg_client.TgSenderInterfaceImp;
@@ -44,6 +45,11 @@ public final class UpdateMessageHandler implements UpdateHandler {
         }
         final Message message = update.getMessage();
         if (message.hasText()) {
+            handleMessage(message);
+        }
+        WebAppData webAppData = message.getWebAppData();
+        if (webAppData != null) {
+            message.setText(webAppData.getData());
             handleMessage(message);
         }
     }
