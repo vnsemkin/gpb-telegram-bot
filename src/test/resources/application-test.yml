@@ -1,8 +1,6 @@
 # Spring
-spring:
-  application:
-    name: "semkin-telegram-bot"
-  cloud.config.enabled: false
+spring.application.name: "telegram-bot"
+spring.cloud.config.enabled: false
 
 # Telegram
 telegram.gpb-bot.name: "GPB IT Factory Backend 2024"
