@@ -45,10 +45,6 @@
             background-color: #004494;
             transform: scale(0.98);
         }
-        .error-message {
-            color: red;
-            margin-top: 20px;
-        }
     </style>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
@@ -72,33 +68,13 @@
                         }
                     })
                 })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.ok) {
-                        Telegram.WebApp.close(); // Close the WebApp after sending the command
-                    } else {
-                        console.error("Error sending data:", data);
-                        displayError("Error sending data: " + JSON.stringify(data));
-                    }
-                })
-                .catch(error => {
-                    console.error("Fetch error:", error);
-                    displayError("Fetch error: " + error.message);
-                });
-        }
-
-        function displayError(message) {
-            const errorDiv = document.getElementById('error-message');
-            if (errorDiv) {
-                errorDiv.textContent = message;
-            } else {
-                const newErrorDiv = document.createElement('div');
-                newErrorDiv.id = 'error-message';
-                newErrorDiv.className = 'error-message';
-                newErrorDiv.textContent = message;
-                document.body.appendChild(newErrorDiv);
-            }
+            }).then(response => response.json()).then(data => {
+                if (data.ok) {
+                    Telegram.WebApp.close(); // Close the WebApp after sending the command
+                } else {
+                    console.error("Error sending data:", data);
+                }
+            });
         }
     </script>
 </head>
