@@ -19,7 +19,7 @@ services:
   middle-service:
     container_name: middle-service
     build:
-      context: ../../semkin-middle-service
+      context: ../../middle-service
       dockerfile: Dockerfile
     env_file:
       - middle-service.env
